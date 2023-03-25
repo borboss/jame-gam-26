@@ -1,9 +1,8 @@
 use bevy::prelude::*;
-use rand::{thread_rng, Rng, seq::{SliceRandom, index::sample}, rngs::ThreadRng};
+use rand::{thread_rng, Rng, rngs::ThreadRng};
 
-use crate::game::card::components::{Card, InInventory, CardType};
 
-use super::components::Inventory;
+use super::{components::{Inventory, InventoryMarker}, card_components::{Card, CardType}};
 
 pub const INVENTORY_SIZE: i32 = 3;
 
@@ -18,7 +17,8 @@ pub fn maintain_inventory(mut commands: Commands, mut query: Query<&mut Inventor
     }
 }
 pub fn init_inventory(mut commands: Commands) {
-    commands.spawn(Inventory{ cards: vec![] });
+    println!("Init Inventory");
+    commands.spawn((Inventory{ cards: vec![] }, InventoryMarker {}));
 }
 
 fn draw_card() -> Card {
@@ -62,7 +62,7 @@ fn draw_card() -> Card {
 
 pub fn print_inventory(query: Query<&Inventory>) {
     for inventory in query.iter() {
-        //println!("{:?}", inventory.cards);
+       // println!("{:?}", inventory.cards);
     }
 }
 

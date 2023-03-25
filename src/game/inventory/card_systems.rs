@@ -1,8 +1,9 @@
 use bevy::prelude::*;
 
-use crate::game::inventory::components::Inventory;
+use crate::game::inventory::{components::Inventory, card_components::Card};
 
-use super::components::Card;
+use super::components::InventoryMarker;
+
 pub const IDLE_POSITIONS:[Vec3; 3] = [Vec3::new(75.0, 150.0, 9.01), Vec3::new(175.0, 2000.0, 9.02), Vec3::new(275.0, 150.0, 9.03)];
 /* 
 
@@ -26,9 +27,10 @@ pub const IDLE_POSITIONS:[Vec3; 3] = [Vec3::new(75.0, 150.0, 9.01), Vec3::new(17
 
 pub fn init_render_cards(
     mut commands: Commands,
-    inventory_query: Query<&Inventory>,
+    inventory_query: Query<&Inventory, With<InventoryMarker>>,
     asset_server: Res<AssetServer>,
 ) {
+    println!("{:?}", inventory_query);
     // get cards:
     for inventory in inventory_query.iter() {
         // should only be one inventory?
