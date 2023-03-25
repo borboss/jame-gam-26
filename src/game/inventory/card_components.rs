@@ -7,6 +7,7 @@ pub struct Card {
     pub description: String,
     pub cost: u8,
     pub sprite_path: String,
+    pub id: u8,
 }
 impl Default for Card {
     fn default() -> Card {
@@ -16,6 +17,7 @@ impl Default for Card {
             description: "Launches a fireball in a random direction in the game!".to_string(),
             cost: 10u8,            
             sprite_path: "sprites/cards/attacks/fireball.png".to_string(),   
+            id: 0u8,
         }
     }
 }

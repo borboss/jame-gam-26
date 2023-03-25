@@ -39,7 +39,6 @@ pub fn spawn_player(
     window_query: Query<&Window, With<PrimaryWindow>>,
     asset_server: Res<AssetServer>,
 ) {
-    println!("Spawned Player");
     let window: &Window = window_query.get_single().unwrap();
 
     commands.spawn((
@@ -57,7 +56,6 @@ pub fn spawn_player(
     // 41, 16 top corner
 pub fn confine_player_movement(
     mut player_query: Query<&mut Transform, With<Player>>,
-    window_query: Query<&Window, With<PrimaryWindow>>,
 ) {
     if let Ok(mut player_transform) = player_query.get_single_mut() {
 

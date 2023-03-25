@@ -15,7 +15,6 @@ pub fn maintain_inventory(mut inventory_resource: ResMut<Inventory>) {
     }
 }
 pub fn init_inventory(mut inventory_resource: ResMut<Inventory>) {
-    println!("{:?}", inventory_resource);
     let needed_cards = INVENTORY_SIZE - (inventory_resource.cards.len() as i32);
     for _ in 0..needed_cards {
         inventory_resource.cards.push(draw_card());
@@ -30,6 +29,7 @@ fn draw_card() -> Card {
             description: "A".to_string(),
             cost: 1,
             sprite_path: "sprites/cards/attacks/blank_attack.png".to_string(),
+            id: 0u8,
         },
         Card {
             card_type: CardType::ATTACK,
@@ -37,6 +37,7 @@ fn draw_card() -> Card {
             description: "B".to_string(),
             cost: 2,
             sprite_path: "sprites/cards/attacks/blank_attack.png".to_string(),
+            id: 0u8,
         },
         Card {
             card_type: CardType::ATTACK,
@@ -44,6 +45,7 @@ fn draw_card() -> Card {
             description: "C".to_string(),
             cost: 3,
             sprite_path: "sprites/cards/attacks/blank_attack.png".to_string(),
+            id: 0u8,
         },
         Card {
             card_type: CardType::ENEMY,
@@ -51,6 +53,7 @@ fn draw_card() -> Card {
             description: "D".to_string(),
             cost: 4,
             sprite_path: "sprites/cards/enemies/blank_enemy.png".to_string(),
+            id: 0u8,
         },
     ];
 
@@ -61,5 +64,5 @@ fn draw_card() -> Card {
 }
 
 pub fn print_inventory(inventory_resource: Res<Inventory>) {
-    println!("{:?}", inventory_resource);
+    //println!("{:?}", inventory_resource);
 }
