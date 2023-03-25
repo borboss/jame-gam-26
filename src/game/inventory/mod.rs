@@ -1,9 +1,15 @@
 use bevy::prelude::{App, Plugin};
 
 pub mod components;
+mod systems;
 
-pub struct ScorePlugin;
-impl Plugin for ScorePlugin {
+use components::*;
+use systems::*;
+
+
+pub struct InventoryPlugin;
+impl Plugin for InventoryPlugin {
     fn build(&self, app: &mut App) {
+        app;
     }
 }

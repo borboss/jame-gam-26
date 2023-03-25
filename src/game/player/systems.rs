@@ -59,8 +59,6 @@ pub fn confine_player_movement(
     window_query: Query<&Window, With<PrimaryWindow>>,
 ) {
     if let Ok(mut player_transform) = player_query.get_single_mut() {
-        println!("{:?}", player_transform.translation);
-        let window: &Window = window_query.get_single().unwrap();
 
         let half_player_size: Vec2 = 0.5f32 * PLAYER_SPRITE_SIZE;
 

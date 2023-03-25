@@ -15,5 +15,6 @@ impl Plugin for PlayerPlugin {
         .add_startup_system(spawn_player)
         .add_system(move_player.before(confine_player_movement))
         .add_system(confine_player_movement);
+    
     }
 }

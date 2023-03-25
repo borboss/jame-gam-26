@@ -1,13 +1,21 @@
 use bevy::prelude::*;
 
 pub mod player;
-use self::player::*;
+mod card;
+mod inventory;
+
+use player::*;
+use card::*;
+use inventory::*;
+
 
 pub struct GamePlugin;
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app
-        .add_plugin(PlayerPlugin);
+        .add_plugin(PlayerPlugin)
+        .add_plugin(CardPlugin)
+        .add_plugin(InventoryPlugin);
     }
 }
 

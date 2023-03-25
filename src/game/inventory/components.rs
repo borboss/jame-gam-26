@@ -1,8 +1,11 @@
-use bevy::prelude::Component;
+use bevy::{prelude::{Component, Resource}, utils::default};
+use crate::game::card::components::Card;
+
 use super::super::card::*;
 
 
-#[derive(Component)]
+#[derive(Resource, Default)]
 pub struct Inventory {
-    cards: Vec<Card>,
+    pub cards: [Card; 4],
 }
+
