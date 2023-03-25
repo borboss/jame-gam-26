@@ -1,6 +1,8 @@
 use bevy::prelude::Component;
 use bevy::prelude::States;
 
+use crate::game::inventory::components::Inventory;
+
 #[derive(Component, Default)]
 pub struct Player {
     pub state: PlayerState,

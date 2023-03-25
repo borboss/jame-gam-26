@@ -28,7 +28,7 @@ pub fn spawn_background(
 ) {
     let window: &Window = window_query.get_single().unwrap();
     commands.spawn((SpriteBundle {
-        transform: Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 0.0f32).with_scale(Vec3::new(3.0f32, 3.0f32, 1.0f32)),
+        transform: Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 0.0f32).with_scale(Vec3::new(3.0f32, 3.0f32, 0.0f32)),
         texture: asset_server.load("sprites/background.png"),
 
         ..default()

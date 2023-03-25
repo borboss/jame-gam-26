@@ -39,6 +39,7 @@ pub fn spawn_player(
     window_query: Query<&Window, With<PrimaryWindow>>,
     asset_server: Res<AssetServer>,
 ) {
+    println!("Spawned Player");
     let window: &Window = window_query.get_single().unwrap();
 
     commands.spawn((
@@ -48,10 +49,7 @@ pub fn spawn_player(
             
             ..default()
         },
-        Player {
-            ..default()
-        },
-        Inventory { cards: vec![] },
+        Player {..default()},
     ));
 }
 

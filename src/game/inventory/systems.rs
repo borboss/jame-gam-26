@@ -7,14 +7,18 @@ use super::components::Inventory;
 
 pub const INVENTORY_SIZE: i32 = 3;
 
+
 pub fn maintain_inventory(mut commands: Commands, mut query: Query<&mut Inventory>) {
     for mut inventory in query.iter_mut() {
         let needed_cards = INVENTORY_SIZE - (inventory.cards.len() as i32);
-        for _ in 0..=needed_cards {
+        for _ in 0..needed_cards {
             inventory.cards.push(draw_card());
         }
 
     }
+}
+pub fn init_inventory(mut commands: Commands) {
+    commands.spawn(Inventory{ cards: vec![] });
 }
 
 fn draw_card() -> Card {
@@ -24,24 +28,28 @@ fn draw_card() -> Card {
             name: "1".to_string(),
             description: "A".to_string(),
             cost: 1,
+            sprite_path: "sprites/cards/attacks/blank_attack.png".to_string(),
         },
         Card {
             card_type: CardType::ATTACK,
             name: "2".to_string(),
             description: "B".to_string(),
             cost: 2,
+            sprite_path: "sprites/cards/attacks/blank_attack.png".to_string(),
         },
         Card {
             card_type: CardType::ATTACK,
             name: "3".to_string(),
             description: "C".to_string(),
             cost: 3,
+            sprite_path: "sprites/cards/attacks/blank_attack.png".to_string(),
         },
         Card {
             card_type: CardType::ENEMY,
             name: "4".to_string(),
             description: "D".to_string(),
             cost: 4,
+            sprite_path: "sprites/cards/enemies/blank_enemy.png".to_string(),
         }
     ];
 
@@ -54,6 +62,7 @@ fn draw_card() -> Card {
 
 pub fn print_inventory(query: Query<&Inventory>) {
     for inventory in query.iter() {
-        println!("{:?}", inventory.cards);
+        //println!("{:?}", inventory.cards);
     }
 }
+
