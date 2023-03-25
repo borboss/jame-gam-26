@@ -1,5 +1,7 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
+use crate::game::inventory::components::Inventory;
+
 use super::components::Player;
 use super::*;
 
@@ -49,6 +51,7 @@ pub fn spawn_player(
         Player {
             ..default()
         },
+        Inventory { cards: vec![] },
     ));
 }
 
