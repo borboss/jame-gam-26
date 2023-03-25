@@ -1,18 +1,23 @@
 use bevy::prelude::Component;
+use bevy::prelude::States;
 
-#[derive(Component)]
+#[derive(Component, Default)]
 pub struct Player {
-
+    pub state: PlayerState,
+    pub direction: PlayerDirection,
 }
 
-enum PlayerState {
+#[derive(States, Debug, Clone, Copy, Eq, PartialEq, Hash, Default)]
+pub enum PlayerState {
     MOVE,
+    #[default] IDLE,
     ATTACK,
     DEAD
 }
-enum PlayerDirection {
+#[derive(States, Debug, Clone, Copy, Eq, PartialEq, Hash, Default)]
+pub enum PlayerDirection {
     UP,
     LEFT,
-    DOWN,
+    #[default] DOWN,
     RIGHT,
 }

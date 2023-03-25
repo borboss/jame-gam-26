@@ -21,9 +21,8 @@ fn main() {
                 primary_window: Some(Window {
                     title: "Seethe Rentoid".into(),
                     resolution: (960.0f32, 540.0f32).into(),
-                    // Tells wasm to resize the window according to the available canvas
+                    // wasm \/
                     fit_canvas_to_parent: true,
-                    // Tells wasm not to override default event handling, like F5, Ctrl+R etc.
                     prevent_default_event_handling: false,
                     ..default()
                 }),

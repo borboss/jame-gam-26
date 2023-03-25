@@ -9,7 +9,7 @@ pub fn spawn_camera(mut commands: Commands, window_query: Query<&Window, With<Pr
     let window: &Window = window_query.get_single().unwrap();
 
     commands.spawn(Camera2dBundle {
-        transform: Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 10.0f32).with_scale(Vec3::new(1.0/3.0, 1.0/3.0, 1.0f32)),
+        transform: Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 10.0f32),
         projection: OrthographicProjection {
             scaling_mode: ScalingMode::AutoMin { 
                 min_height: 540.0f32,
@@ -28,7 +28,7 @@ pub fn spawn_background(
 ) {
     let window: &Window = window_query.get_single().unwrap();
     commands.spawn((SpriteBundle {
-        transform: Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 0.0f32),
+        transform: Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 0.0f32).with_scale(Vec3::new(3.0f32, 3.0f32, 1.0f32)),
         texture: asset_server.load("sprites/background.png"),
 
         ..default()

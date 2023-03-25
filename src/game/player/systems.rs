@@ -46,6 +46,45 @@ pub fn spawn_player(
             
             ..default()
         },
-        Player {},
+        Player {
+            ..default()
+        },
     ));
+}
+
+
+    // 41, 16 top corner
+pub fn confine_player_movement(
+    mut player_query: Query<&mut Transform, With<Player>>,
+    window_query: Query<&Window, With<PrimaryWindow>>,
+) {
+    if let Ok(mut player_transform) = player_query.get_single_mut() {
+        println!("{:?}", player_transform.translation);
+        let window: &Window = window_query.get_single().unwrap();
+
+        let half_player_size: Vec2 = 0.5f32 * PLAYER_SPRITE_SIZE;
+
+        let x_min: f32 = 0.0 + half_player_size.x;
+        let x_max: f32 = 960.0 - half_player_size.x;
+        let y_min: f32 = (10.0f32*5.0f32) + half_player_size.y;
+        let y_max: f32 = 540.0 - 100.0 - half_player_size.y;
+
+        let mut translation: Vec3 = player_transform.translation;
+
+        // Bound x position
+        if translation.x < x_min {
+            translation.x = x_min;
+        } else if translation.x > x_max {
+            translation.x = x_max;
+        }
+
+        // Bound y position
+        if translation.y < y_min {
+            translation.y = y_min;
+        } else if translation.y > y_max {
+            translation.y = y_max;
+        }
+
+        player_transform.translation = translation;
+    }
 }
