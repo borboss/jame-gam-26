@@ -7,17 +7,17 @@ pub struct Card {
     pub description: String,
     pub cost: u8,
     pub sprite_path: String,
-    pub id: u8,
+    pub id: i8,
 }
 impl Default for Card {
     fn default() -> Card {
         Card {
-            card_type: CardType::ATTACK,
-            name: "Fireball".to_string(),
-            description: "Launches a fireball in a random direction in the game!".to_string(),
+            card_type: CardType::Projectile,
+            name: "1".to_string(),
+            description: "A".to_string(),
             cost: 10u8,            
-            sprite_path: "sprites/cards/attacks/fireball.png".to_string(),   
-            id: 0u8,
+            sprite_path: "sprites/cards/attacks/blank_attack.png".to_string(),   
+            id: 0i8,
         }
     }
 }
@@ -27,6 +27,6 @@ pub struct InInventory {}
 
 #[derive(Default, Clone, Copy, Debug)]
 pub enum CardType {
-    ENEMY,
-    #[default] ATTACK
+    #[default] Projectile,
+    Melee,
 }

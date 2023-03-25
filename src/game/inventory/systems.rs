@@ -8,14 +8,11 @@ use super::{
 
 pub const INVENTORY_SIZE: i32 = 3;
 
-pub fn maintain_inventory(mut inventory_resource: ResMut<Inventory>) {
-    let needed_cards = INVENTORY_SIZE - (inventory_resource.cards.len() as i32);
-    for _ in 0..needed_cards {
-        inventory_resource.cards.push(draw_card());
-    }
+pub fn maintain_inventory(inventory_resource: ResMut<Inventory>) {
+    init_inventory(inventory_resource);
 }
 pub fn init_inventory(mut inventory_resource: ResMut<Inventory>) {
-    let needed_cards = INVENTORY_SIZE - (inventory_resource.cards.len() as i32);
+    let needed_cards: i32 = INVENTORY_SIZE - (inventory_resource.cards.len() as i32);
     for _ in 0..needed_cards {
         inventory_resource.cards.push(draw_card());
     }
@@ -24,36 +21,36 @@ pub fn init_inventory(mut inventory_resource: ResMut<Inventory>) {
 fn draw_card() -> Card {
     let cards = vec![
         Card {
-            card_type: CardType::ATTACK,
-            name: "1".to_string(),
-            description: "A".to_string(),
+            card_type: CardType::Projectile,
+            name: "Fireball".to_string(),
+            description: "Launches a fireball in a random direction in the game!".to_string(),
             cost: 1,
-            sprite_path: "sprites/cards/attacks/blank_attack.png".to_string(),
-            id: 0u8,
+            sprite_path: "sprites/cards/projectiles/fireball.png".to_string(),
+            id: 0i8,
         },
         Card {
-            card_type: CardType::ATTACK,
+            card_type: CardType::Projectile,
             name: "2".to_string(),
             description: "B".to_string(),
             cost: 2,
-            sprite_path: "sprites/cards/attacks/blank_attack.png".to_string(),
-            id: 0u8,
+            sprite_path: "sprites/cards/projectiles/blank_attack.png".to_string(),
+            id: 0i8,
         },
         Card {
-            card_type: CardType::ATTACK,
+            card_type: CardType::Projectile,
             name: "3".to_string(),
             description: "C".to_string(),
             cost: 3,
-            sprite_path: "sprites/cards/attacks/blank_attack.png".to_string(),
-            id: 0u8,
+            sprite_path: "sprites/cards/projectiles/blank_attack.png".to_string(),
+            id: 0i8,
         },
         Card {
-            card_type: CardType::ENEMY,
+            card_type: CardType::Melee,
             name: "4".to_string(),
             description: "D".to_string(),
             cost: 4,
-            sprite_path: "sprites/cards/enemies/blank_enemy.png".to_string(),
-            id: 0u8,
+            sprite_path: "sprites/cards/melee/blank_enemy.png".to_string(),
+            id: 0i8,
         },
     ];
 
@@ -61,8 +58,4 @@ fn draw_card() -> Card {
     let index = rng.gen_range(0..cards.len());
     let card = cards[index].clone();
     return card;
-}
-
-pub fn print_inventory(inventory_resource: Res<Inventory>) {
-    //println!("{:?}", inventory_resource);
 }

@@ -19,9 +19,8 @@ impl Plugin for InventoryPlugin {
             .init_resource::<Inventory>()
             .add_startup_system(init_inventory.before(init_render_cards))
             .add_startup_system(init_render_cards)
-            .add_system(maintain_inventory.before(debug_cards))
-            .add_system(debug_cards)
-            .add_system(print_inventory)
-            .add_system(invis_cards);
+            .add_system(maintain_inventory.before(card_handler))
+            .add_system(card_handler.after(maintain_inventory))
+            .add_system(inventory_changed.after(card_handler));
     }
 }
