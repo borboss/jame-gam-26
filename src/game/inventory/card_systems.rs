@@ -1,11 +1,14 @@
 use bevy::prelude::*;
 
-use crate::game::inventory::{components::Inventory, card_components::Card};
+use crate::game::inventory::card_components::Card;
+use crate::game::inventory::components::Inventory;
 
-use super::components::InventoryMarker;
-
-pub const IDLE_POSITIONS:[Vec3; 3] = [Vec3::new(75.0, 150.0, 9.01), Vec3::new(175.0, 2000.0, 9.02), Vec3::new(275.0, 150.0, 9.03)];
-/* 
+pub const IDLE_POSITIONS: [Vec3; 3] = [
+    Vec3::new(75.0, 150.0, 9.01),
+    Vec3::new(175.0, 2000.0, 9.02),
+    Vec3::new(275.0, 150.0, 9.03),
+];
+/*
 
     Z-Axis Meanings:
     10.0 is Camera
@@ -24,40 +27,32 @@ pub const IDLE_POSITIONS:[Vec3; 3] = [Vec3::new(75.0, 150.0, 9.01), Vec3::new(17
     0.0 is Background
 */
 
-
 pub fn init_render_cards(
     mut commands: Commands,
-    inventory_query: Query<&Inventory, With<InventoryMarker>>,
+    inventory_resource: Res<Inventory>,
     asset_server: Res<AssetServer>,
 ) {
-    println!("{:?}", inventory_query);
+    println!("{:?}", inventory_resource);
     // get cards:
-    for inventory in inventory_query.iter() {
-        // should only be one inventory?
-        let mut j:usize = 0;
-        for card in &inventory.cards {
-            commands.spawn(
-                (
-                    SpriteBundle {
-                        texture: asset_server.load(&card.sprite_path),
-                        transform: Transform::from_translation(IDLE_POSITIONS[j]).with_scale(Vec3::new(2.5f32, 2.5f32, 2.5f32)),
-                        ..default()
-                    },
-                    Card {..default()},
-                ),
-            );
-            j += 1;
-            println!("Spawning card {}", card.name);
-        }
-        println!("Spawning cardS");
+    let mut j: usize = 0;
+    println!("Spawning cardS");
+    for card in &inventory_resource.cards {
+        commands.spawn((
+            SpriteBundle {
+                texture: asset_server.load(&card.sprite_path),
+                transform: Transform::from_translation(IDLE_POSITIONS[j])
+                    .with_scale(Vec3::new(2.5f32, 2.5f32, 2.5f32)),
+                ..default()
+            },
+            Card { ..default() },
+        ));
+        j += 1;
+        println!("Spawning card {}", card.name);
     }
     println!("Render cardS done");
 }
 
-pub fn debug_cards (
-    mut commands: Commands,
-    card_query: Query<&mut Transform, With<Card>>
-) {
+pub fn debug_cards(card_query: Query<&mut Transform, With<Card>>) {
     for card_transform in card_query.iter() {
         println!("{}", card_transform.translation);
     }

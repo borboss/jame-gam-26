@@ -1,24 +1,25 @@
 use bevy::prelude::*;
-use rand::{thread_rng, Rng, rngs::ThreadRng};
+use rand::{rngs::ThreadRng, thread_rng, Rng};
 
-
-use super::{components::{Inventory, InventoryMarker}, card_components::{Card, CardType}};
+use super::{
+    card_components::{Card, CardType},
+    components::Inventory,
+};
 
 pub const INVENTORY_SIZE: i32 = 3;
 
-
-pub fn maintain_inventory(mut commands: Commands, mut query: Query<&mut Inventory>) {
-    for mut inventory in query.iter_mut() {
-        let needed_cards = INVENTORY_SIZE - (inventory.cards.len() as i32);
-        for _ in 0..needed_cards {
-            inventory.cards.push(draw_card());
-        }
-
+pub fn maintain_inventory(mut inventory_resource: ResMut<Inventory>) {
+    let needed_cards = INVENTORY_SIZE - (inventory_resource.cards.len() as i32);
+    for _ in 0..needed_cards {
+        inventory_resource.cards.push(draw_card());
     }
 }
-pub fn init_inventory(mut commands: Commands) {
-    println!("Init Inventory");
-    commands.spawn((Inventory{ cards: vec![] }, InventoryMarker {}));
+pub fn init_inventory(mut inventory_resource: ResMut<Inventory>) {
+    println!("{:?}", inventory_resource);
+    let needed_cards = INVENTORY_SIZE - (inventory_resource.cards.len() as i32);
+    for _ in 0..needed_cards {
+        inventory_resource.cards.push(draw_card());
+    }
 }
 
 fn draw_card() -> Card {
@@ -50,19 +51,15 @@ fn draw_card() -> Card {
             description: "D".to_string(),
             cost: 4,
             sprite_path: "sprites/cards/enemies/blank_enemy.png".to_string(),
-        }
+        },
     ];
 
     let mut rng: ThreadRng = thread_rng();
     let index = rng.gen_range(0..cards.len());
     let card = cards[index].clone();
     return card;
-
 }
 
-pub fn print_inventory(query: Query<&Inventory>) {
-    for inventory in query.iter() {
-       // println!("{:?}", inventory.cards);
-    }
+pub fn print_inventory(inventory_resource: Res<Inventory>) {
+    println!("{:?}", inventory_resource);
 }
-

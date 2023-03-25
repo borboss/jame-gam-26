@@ -1,14 +1,11 @@
-use bevy::prelude::Component;
+use bevy::prelude::{Component, Resource};
 
 use super::card_components::Card;
 
 
 
 
-#[derive(Component, Debug)]
+#[derive(Resource, Debug, Default)]
 pub struct Inventory {
     pub cards: Vec<Card>,
 }
-
-#[derive(Component)]
-pub struct InventoryMarker;
