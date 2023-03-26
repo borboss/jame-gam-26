@@ -1,6 +1,5 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
-
 use super::components::{Player, HP, MP};
 use super::*;
 
@@ -8,7 +7,7 @@ pub fn move_player(
     keyboard_input: Res<Input<KeyCode>>,
     mut player_query: Query<&mut Transform, With<Player>>,
     time: Res<Time>,
-    mut player_position: ResMut<PlayerPosition>
+    mut player_position: ResMut<PlayerPosition>,
 ) {
     if let Ok(mut player_transform) = player_query.get_single_mut() {
         player_position.position = player_transform.translation;
@@ -37,42 +36,39 @@ pub fn move_player(
 
 pub fn spawn_player(
     mut commands: Commands,
-    window_query: Query<&Window, With<PrimaryWindow>>,
     asset_server: Res<AssetServer>,
     mut hp: ResMut<HP>,
     mut mp: ResMut<MP>,
+    mut player_position: ResMut<PlayerPosition>,
 ) {
-    let window: &Window = window_query.get_single().unwrap();
-
     commands.spawn((
         SpriteBundle {
             texture: asset_server.load("sprites/player.png"),
-            transform: Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 1.0f32).with_scale(Vec3::new(5.0f32, 5.0f32, 1.0f32)),
-            
+            transform: Transform::from_xyz(480.0, 265.0, 1.0f32)
+                .with_scale(Vec3::new(5.0f32, 5.0f32, 1.0f32)),
+
             ..default()
         },
-        Player {..default()},
+        Player { ..default() },
     ));
 
+    // init resources
     hp.max_hp = 100;
     hp.hp = 100;
     mp.max_mp = 100;
     mp.mp = 100;
 
+    player_position.position = Vec3::new(480.0, 265.0, 1.0f32);
 }
 
-
-    // 41, 16 top corner
-pub fn confine_player_movement(
-    mut player_query: Query<&mut Transform, With<Player>>,
-) {
+// 41, 16 top corner
+pub fn confine_player_movement(mut player_query: Query<&mut Transform, With<Player>>) {
     if let Ok(mut player_transform) = player_query.get_single_mut() {
-
         let half_player_size: Vec2 = 0.5f32 * PLAYER_SPRITE_SIZE;
 
         let x_min: f32 = 0.0 + half_player_size.x;
         let x_max: f32 = 960.0 - half_player_size.x;
-        let y_min: f32 = (10.0f32*5.0f32) + half_player_size.y;
+        let y_min: f32 = (10.0f32 * 5.0f32) + half_player_size.y;
         let y_max: f32 = 540.0 - 100.0 - half_player_size.y;
 
         let mut translation: Vec3 = player_transform.translation;

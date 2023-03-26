@@ -3,18 +3,19 @@ use bevy::prelude::*;
 #[derive(Component, Default)]
 pub struct Enemy {
     pub direction: Vec3,
-    pub health:i32,
-    pub max_health:i32,
-    pub speed:i32,
-    pub enemy_type: EnemyType
+    pub health: i32,
+    pub max_health: i32,
+    pub speed: f32,
+    pub enemy_type: EnemyType,
 }
 
 #[derive(Default)]
 pub enum EnemyType {
-    #[default] Other, // Other in any type will crash the game. Do not instantiate anything with an Other type.
+    #[default]
+    Other, // Other in any type will crash the game. Do not instantiate anything with an Other type.
     Swordsman,
     Archer,
-    Mage
+    Mage,
 }
 
 use bevy::{prelude::Resource, time::Timer, time::TimerMode};
@@ -39,6 +40,4 @@ pub struct AnimationIndices {
 }
 
 #[derive(Component, Deref, DerefMut)]
-pub struct AnimationTimer(
-    pub Timer
-);
+pub struct AnimationTimer(pub Timer);

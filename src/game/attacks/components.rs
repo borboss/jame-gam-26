@@ -4,7 +4,7 @@ use bevy::prelude::{Component, Vec2};
 pub struct SpawnedProjectile {
     pub direction: Vec2,
     pub total_bounces: u8,
-    pub max_bounces: u8
+    pub max_bounces: u8,
 }
 #[derive(Component)]
 pub struct DamageEnemy {}
@@ -12,5 +12,5 @@ pub struct DamageEnemy {}
 pub struct DamagePlayer {}
 #[derive(Component)]
 pub struct FadeSoon {
-    pub time: u8
+    pub time: u8,
 }

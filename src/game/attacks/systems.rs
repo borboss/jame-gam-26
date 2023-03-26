@@ -1,4 +1,4 @@
-use bevy::{prelude::*};
+use bevy::prelude::*;
 
 use bevy_tweening::Lerp;
 
@@ -11,9 +11,10 @@ pub fn fader(
 ) {
     for (entity, mut sprite, fade_component) in fader_query.iter_mut() {
         let a = sprite.color.a();
-        sprite
-            .color
-            .set_a(a.lerp(&0.0f32, &(time.delta_seconds() / fade_component.time as f32 )));
+        sprite.color.set_a(a.lerp(
+            &0.0f32,
+            &(time.delta_seconds() / fade_component.time as f32),
+        ));
         if sprite.color.a() <= 1.0 {
             commands.entity(entity).despawn();
         }

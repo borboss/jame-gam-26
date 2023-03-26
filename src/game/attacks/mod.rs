@@ -8,8 +8,6 @@ pub struct AttackPlugin;
 
 impl Plugin for AttackPlugin {
     fn build(&self, app: &mut App) {
-        app
-            .add_system(move_projectile)
-            .add_system(fader);
+        app.add_system(move_projectile).add_system(fader);
     }
 }
