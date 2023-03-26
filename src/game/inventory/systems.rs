@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use rand::{rngs::ThreadRng, thread_rng, Rng};
 
 use super::{
-    card_components::{Card, CardType, ProjectileType},
+    card_components::{Card, CardType, ProjectileType, MeleeType},
     components::Inventory,
 };
 
@@ -29,11 +29,11 @@ fn draw_card() -> Card {
             id: 0i8,
         },
         Card {
-            card_type: CardType::Projectile(ProjectileType::Fireball),
-            name: "2".to_string(),
-            description: "B".to_string(),
-            cost: 2,
-            sprite_path: "sprites/cards/projectiles/blank_attack.png".to_string(),
+            card_type: CardType::Melee(MeleeType::Stomp),
+            name: "Stomp".to_string(),
+            description: "Stomp nearby enemies and regain some MP.".to_string(),
+            cost: 5,
+            sprite_path: "sprites/cards/melee/stomp.png".to_string(),
             id: 0i8,
         },
         Card {

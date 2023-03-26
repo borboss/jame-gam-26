@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy_tweening::Lerp;
 
-use crate::game::attacks::components::DamageEnemy;
+use crate::game::attacks::components::{DamageEnemy, FadeSoon};
 use crate::game::inventory::components::Inventory;
 use crate::game::player::components::MP;
 use crate::game::{attacks::components::SpawnedProjectile, inventory::card_components::Card};
@@ -168,7 +168,16 @@ fn play_card(
     match &card.card_type {
         CardType::Melee(melee_type) => match melee_type {
             MeleeType::Stomp => {
-                todo!();
+                commands.spawn((
+                    SpriteBundle {
+                        texture: asset_server.load("sprites/effects/stomp"),
+                        ..default()
+                    },
+                    FadeSoon {
+                        time: 10,
+                    },
+                    DamageEnemy {},
+                ));
             }
             MeleeType::Other => panic!("No card should have meleetype other."),
         },
@@ -179,7 +188,9 @@ fn play_card(
                         texture: asset_server.load("sprites/projectiles/fireball"),
                         ..default()
                     },
-                    SpawnedProjectile {},
+                    SpawnedProjectile {
+                        max_bounces: 3,
+                    },
                     DamageEnemy {},
                 ));
             }
