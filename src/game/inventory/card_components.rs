@@ -12,7 +12,7 @@ pub struct Card {
 impl Default for Card {
     fn default() -> Card {
         Card {
-            card_type: CardType::Projectile,
+            card_type: CardType::Projectile(ProjectileType::Fireball),
             name: "1".to_string(),
             description: "A".to_string(),
             cost: 10u8,            
@@ -27,6 +27,18 @@ pub struct InInventory {}
 
 #[derive(Default, Clone, Copy, Debug)]
 pub enum CardType {
-    #[default] Projectile,
-    Melee,
+    Projectile(ProjectileType),
+    Melee(MeleeType),
+    #[default] Other,
+}
+
+#[derive(Default, Clone, Copy, Debug)]
+pub enum MeleeType {
+    Stomp,
+    #[default] Other,
+}
+#[derive(Default, Clone, Copy, Debug)]
+pub enum ProjectileType {
+    Fireball,
+    #[default] Other,
 }

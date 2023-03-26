@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use rand::{rngs::ThreadRng, thread_rng, Rng};
 
 use super::{
-    card_components::{Card, CardType},
+    card_components::{Card, CardType, ProjectileType},
     components::Inventory,
 };
 
@@ -21,7 +21,7 @@ pub fn init_inventory(mut inventory_resource: ResMut<Inventory>) {
 fn draw_card() -> Card {
     let cards = vec![
         Card {
-            card_type: CardType::Projectile,
+            card_type: CardType::Projectile(ProjectileType::Fireball),
             name: "Fireball".to_string(),
             description: "Launches a fireball in a random direction in the game!".to_string(),
             cost: 1,
@@ -29,7 +29,7 @@ fn draw_card() -> Card {
             id: 0i8,
         },
         Card {
-            card_type: CardType::Projectile,
+            card_type: CardType::Projectile(ProjectileType::Fireball),
             name: "2".to_string(),
             description: "B".to_string(),
             cost: 2,
@@ -37,7 +37,7 @@ fn draw_card() -> Card {
             id: 0i8,
         },
         Card {
-            card_type: CardType::Projectile,
+            card_type: CardType::Projectile(ProjectileType::Fireball),
             name: "3".to_string(),
             description: "C".to_string(),
             cost: 3,
@@ -45,7 +45,7 @@ fn draw_card() -> Card {
             id: 0i8,
         },
         Card {
-            card_type: CardType::Melee,
+            card_type: CardType::Projectile(ProjectileType::Fireball),
             name: "4".to_string(),
             description: "D".to_string(),
             cost: 4,

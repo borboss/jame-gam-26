@@ -2,9 +2,10 @@ use bevy::prelude::*;
 
 pub mod player;
 mod inventory;
-mod gui;
+mod stat_bar;
+pub mod attacks;
 
-use gui::*;
+use stat_bar::*;
 use player::*;
 use inventory::*;
 
@@ -15,7 +16,7 @@ impl Plugin for GamePlugin {
         app
         .add_plugin(PlayerPlugin)
         .add_plugin(InventoryPlugin)
-        .add_plugin(GuiPlugin);
+        .add_plugin(StatBarPlugin);
     }
 }
 

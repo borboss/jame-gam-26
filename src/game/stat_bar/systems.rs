@@ -1,16 +1,10 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
-use super::player::components::*;
-pub struct GuiPlugin;
+use crate::game::player::components::{HP, MP};
 
-impl Plugin for GuiPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_startup_system(init_render_bar)
-            .add_system(update_bars.after(init_render_bar));
-    }
-}
+use super::components::*;
 
-fn init_render_bar(mut commands: Commands, window_query: Query<&Window, With<PrimaryWindow>>) {
+pub fn init_render_bar(mut commands: Commands, window_query: Query<&Window, With<PrimaryWindow>>) {
     let window: &Window = window_query.get_single().unwrap();
     // HP
     commands.spawn((
@@ -61,7 +55,7 @@ fn init_render_bar(mut commands: Commands, window_query: Query<&Window, With<Pri
     },)); // < Base to see it better
 }
 
-fn update_bars(
+pub fn update_bars(
     mut hp_bar: Query<&mut Sprite, (With<HpMarker>, Without<MpMarker>)>,
     hp: Res<HP>,
     mut mp_bar: Query<&mut Sprite, (With<MpMarker>, Without<HpMarker>)>,
@@ -83,11 +77,3 @@ fn update_bars(
     }
 }
 
-#[derive(Component)]
-pub struct StatusBar {}
-
-#[derive(Component)]
-pub struct HpMarker {}
-
-#[derive(Component)]
-pub struct MpMarker {}

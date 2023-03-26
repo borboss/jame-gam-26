@@ -2,11 +2,12 @@ use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy_tweening::Lerp;
 
-use crate::game::inventory::card_components::Card;
+use crate::game::attacks::components::DamageEnemy;
 use crate::game::inventory::components::Inventory;
 use crate::game::player::components::MP;
+use crate::game::{attacks::components::SpawnedProjectile, inventory::card_components::Card};
 
-use super::card_components::CardType;
+use super::card_components::{CardType, MeleeType, ProjectileType};
 
 pub const IDLE_POSITIONS: [Vec3; 3] = [
     Vec3::new(75.0, 90.0, 9.01),
@@ -71,7 +72,9 @@ pub fn card_handler(
     btn: Res<Input<MouseButton>>,
     keys: Res<Input<KeyCode>>,
     mut inventory_resource: ResMut<Inventory>,
-    mut mp: ResMut<MP>
+    mut mp: ResMut<MP>,
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
 ) {
     let window: &Window = window_query.get_single().unwrap();
     let (camera_transform, camera) = camera_query.single_mut();
@@ -87,7 +90,7 @@ pub fn card_handler(
         }
         for (_, _, _, card) in card_query.iter() {
             if id == card.id {
-                play_card(card, &mut mp);
+                play_card(card, &mut mp, &mut commands, &asset_server);
                 inventory_resource.cards.remove(card.id as usize);
             }
         }
@@ -112,7 +115,7 @@ pub fn card_handler(
             if btn.just_pressed(MouseButton::Left) {
                 for (_, _, _, card) in card_query.iter() {
                     if card.id == closest_card {
-                        play_card(card, &mut mp);
+                        play_card(card, &mut mp, &mut commands, &asset_server);
 
                         inventory_resource.cards.remove(card.id as usize);
                     }
@@ -155,19 +158,34 @@ fn find_closest_card<'a>(
     return -1;
 }
 
-fn play_projectile_card(card: &Card, mp: &mut ResMut<MP>) {
-    println!("play projectile card");
-    mp.mp -= 10;
-}
-fn play_melee_card(card: &Card, mp: &mut ResMut<MP>) {
-    println!("play melee card");
-    mp.mp -= 10;
-}
-fn play_card(card: &Card, mp: &mut ResMut<MP>) {
+fn play_card(
+    card: &Card,
+    mp: &mut ResMut<MP>,
+    commands: &mut Commands,
+    asset_server: &Res<AssetServer>,
+) {
     // temp
-    match card.card_type {
-        CardType::Melee => play_melee_card(card, mp),
-        CardType::Projectile => play_projectile_card(card, mp),
+    match &card.card_type {
+        CardType::Melee(melee_type) => match melee_type {
+            MeleeType::Stomp => {
+                todo!();
+            }
+            MeleeType::Other => panic!("No card should have meleetype other."),
+        },
+        CardType::Projectile(projectile_type) => match projectile_type {
+            ProjectileType::Fireball => {
+                commands.spawn((
+                    SpriteBundle {
+                        texture: asset_server.load("sprites/projectiles/fireball"),
+                        ..default()
+                    },
+                    SpawnedProjectile {},
+                    DamageEnemy {},
+                ));
+            }
+            ProjectileType::Other => panic!("No card should have projectiletype other."),
+        },
+        CardType::Other => panic!("No card should have type other."),
     }
 }
 
