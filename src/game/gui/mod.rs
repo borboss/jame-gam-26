@@ -46,13 +46,11 @@ fn init_render_bar(
 fn update_health_bar(
     mut hp_bar: Query<&mut Sprite, With<HpMarker>>,
     window_query: Query<&Window, With<PrimaryWindow>>,
-    player_query: Query<&HP, With<Player>>,
+    mut HP: ResMut<HP>
 ) {
     let mut _health_bar_bundle = hp_bar.get_single_mut().unwrap();
-    let player_hp = player_query.get_single().unwrap();
-    let window: &Window = window_query.get_single().unwrap();
     _health_bar_bundle.custom_size = Some(Vec2::new(
-        250.0 * (player_hp.hp as f32 / player_hp.max_hp as f32),
+        250.0 * (HP.hp as f32 / HP.max_hp as f32),
         12.5f32,
     ));
 }

@@ -37,6 +37,8 @@ pub fn spawn_player(
     mut commands: Commands,
     window_query: Query<&Window, With<PrimaryWindow>>,
     asset_server: Res<AssetServer>,
+    mut HP: ResMut<HP>,
+    mut MP: ResMut<MP>,
 ) {
     let window: &Window = window_query.get_single().unwrap();
 
@@ -48,15 +50,13 @@ pub fn spawn_player(
             ..default()
         },
         Player {..default()},
-        HP {
-            hp: 100,
-            max_hp: 100
-        },
-        MP {
-            mp: 100,
-            max_mp: 100
-        }
     ));
+
+    HP.max_hp = 100;
+    HP.hp = 100;
+    MP.max_mp = 100;
+    MP.mp = 100;
+
 }
 
 

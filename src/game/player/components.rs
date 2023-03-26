@@ -1,4 +1,5 @@
 use bevy::prelude::Component;
+use bevy::prelude::Resource;
 use bevy::prelude::States;
 
 #[derive(Component, Default)]
@@ -22,12 +23,12 @@ pub enum PlayerDirection {
     RIGHT,
 }
 
-#[derive(Component)]
+#[derive(Resource, Default)]
 pub struct HP {
     pub hp: i32,
     pub max_hp: i32
 }
-#[derive(Component)]
+#[derive(Resource, Default)]
 pub struct MP {
     pub mp: i32,
     pub max_mp: i32
