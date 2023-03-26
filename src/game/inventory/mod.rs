@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_tweening::*;
 
 pub mod components;
 pub mod card_components;
@@ -15,6 +16,7 @@ impl Plugin for InventoryPlugin {
     fn build(&self, app: &mut App) {
         app
             .init_resource::<Inventory>()
+            .add_plugin(TweeningPlugin)
             .add_startup_system(init_inventory.before(init_render_cards))
             .add_startup_system(init_render_cards)
             .add_system(maintain_inventory.before(card_handler))

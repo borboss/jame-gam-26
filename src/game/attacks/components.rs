@@ -1,7 +1,8 @@
-use bevy::prelude::Component;
+use bevy::prelude::{Component, Vec2};
 
 #[derive(Component)]
 pub struct SpawnedProjectile {
+    pub direction: Vec2,
     pub max_bounces: u8
 }
 #[derive(Component)]

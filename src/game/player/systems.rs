@@ -8,8 +8,10 @@ pub fn move_player(
     keyboard_input: Res<Input<KeyCode>>,
     mut player_query: Query<&mut Transform, With<Player>>,
     time: Res<Time>,
+    mut player_position: ResMut<PlayerPosition>
 ) {
     if let Ok(mut player_transform) = player_query.get_single_mut() {
+        player_position.position = player_transform.translation;
         let mut direction: Vec3 = Vec3::ZERO;
 
         if keyboard_input.pressed(KeyCode::Left) || keyboard_input.pressed(KeyCode::A) {

@@ -1,10 +1,12 @@
+use bevy::math::vec2;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy_tweening::Lerp;
+use rand::random;
 
 use crate::game::attacks::components::{DamageEnemy, FadeSoon};
 use crate::game::inventory::components::Inventory;
-use crate::game::player::components::MP;
+use crate::game::player::components::{MP, Player, PlayerPosition};
 use crate::game::{attacks::components::SpawnedProjectile, inventory::card_components::Card};
 
 use super::card_components::{CardType, MeleeType, ProjectileType};
@@ -55,9 +57,13 @@ pub fn init_render_cards(
                     .with_scale(Vec3::new(2.5f32, 2.5f32, 2.5f32)),
                 ..default()
             },
-            Card {
+            Card {            
+                card_type: card.card_type,
+                name: card.name.clone(),
+                description: card.description.clone(),
+                cost: card.cost,            
+                sprite_path: card.sprite_path.clone(),   
                 id: j as i8,
-                ..default()
             },
         ));
         j += 1;
@@ -75,9 +81,11 @@ pub fn card_handler(
     mut mp: ResMut<MP>,
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    player_position: Res<PlayerPosition>,
 ) {
     let window: &Window = window_query.get_single().unwrap();
     let (camera_transform, camera) = camera_query.single_mut();
+   
 
     if keys.any_just_released([KeyCode::Key1, KeyCode::Key2, KeyCode::Key3]) {
         let mut id: i8 = 0;
@@ -90,7 +98,7 @@ pub fn card_handler(
         }
         for (_, _, _, card) in card_query.iter() {
             if id == card.id {
-                play_card(card, &mut mp, &mut commands, &asset_server);
+                play_card(card, &mut mp, &mut commands, &asset_server, &player_position.position);
                 inventory_resource.cards.remove(card.id as usize);
             }
         }
@@ -115,7 +123,7 @@ pub fn card_handler(
             if btn.just_pressed(MouseButton::Left) {
                 for (_, _, _, card) in card_query.iter() {
                     if card.id == closest_card {
-                        play_card(card, &mut mp, &mut commands, &asset_server);
+                        play_card(card, &mut mp, &mut commands, &asset_server, &player_position.position);
 
                         inventory_resource.cards.remove(card.id as usize);
                     }
@@ -163,14 +171,17 @@ fn play_card(
     mp: &mut ResMut<MP>,
     commands: &mut Commands,
     asset_server: &Res<AssetServer>,
+    player_position: &Vec3,
 ) {
     // temp
     match &card.card_type {
         CardType::Melee(melee_type) => match melee_type {
             MeleeType::Stomp => {
+                println!("Melee/Stomp played");
                 commands.spawn((
                     SpriteBundle {
-                        texture: asset_server.load("sprites/effects/stomp"),
+                        texture: asset_server.load("sprites/effects/stomp.png"),
+                        transform: Transform::from_translation(Vec3::new(player_position.x, player_position.y, 5.0)),
                         ..default()
                     },
                     FadeSoon {
@@ -183,12 +194,15 @@ fn play_card(
         },
         CardType::Projectile(projectile_type) => match projectile_type {
             ProjectileType::Fireball => {
+                println!("Projectile/Fireball played");
                 commands.spawn((
                     SpriteBundle {
-                        texture: asset_server.load("sprites/projectiles/fireball"),
+                        texture: asset_server.load("sprites/projectiles/fireball.png"),
+                        transform: Transform::from_translation(Vec3::new(player_position.x, player_position.y, 5.0)),
                         ..default()
                     },
                     SpawnedProjectile {
+                        direction: Vec2::new(random::<f32>(), random::<f32>()).normalize(),
                         max_bounces: 3,
                     },
                     DamageEnemy {},
