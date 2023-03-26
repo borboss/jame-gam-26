@@ -21,3 +21,14 @@ pub enum PlayerDirection {
     #[default] DOWN,
     RIGHT,
 }
+
+#[derive(Component)]
+pub struct HP {
+    pub hp: i32,
+    pub max_hp: i32
+}
+#[derive(Component)]
+pub struct MP {
+    pub mp: i32,
+    pub max_mp: i32
+}

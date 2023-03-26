@@ -2,7 +2,9 @@ use bevy::prelude::*;
 
 pub mod player;
 mod inventory;
+mod gui;
 
+use gui::*;
 use player::*;
 use inventory::*;
 
@@ -12,7 +14,8 @@ impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app
         .add_plugin(PlayerPlugin)
-        .add_plugin(InventoryPlugin);
+        .add_plugin(InventoryPlugin)
+        .add_plugin(GuiPlugin);
     }
 }
 

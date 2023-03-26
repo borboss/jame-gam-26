@@ -1,8 +1,7 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
-use crate::game::inventory::components::Inventory;
 
-use super::components::Player;
+use super::components::{Player, HP, MP};
 use super::*;
 
 pub fn move_player(
@@ -49,6 +48,14 @@ pub fn spawn_player(
             ..default()
         },
         Player {..default()},
+        HP {
+            hp: 100,
+            max_hp: 100
+        },
+        MP {
+            mp: 100,
+            max_mp: 100
+        }
     ));
 }
 

@@ -4,6 +4,7 @@ use bevy_tweening::Lerp;
 
 use crate::game::inventory::card_components::Card;
 use crate::game::inventory::components::Inventory;
+use crate::game::player::components::{Player, HP};
 
 use super::card_components::CardType;
 
@@ -70,6 +71,7 @@ pub fn card_handler(
     btn: Res<Input<MouseButton>>,
     keys: Res<Input<KeyCode>>,
     mut inventory_resource: ResMut<Inventory>,
+    mut player_query: Query<&mut HP, With<Player>>, // temp
 ) {
     let window: &Window = window_query.get_single().unwrap();
     let (camera_transform, camera) = camera_query.single_mut();
@@ -85,13 +87,12 @@ pub fn card_handler(
         }
         for (_, _, _, card) in card_query.iter() {
             if id == card.id {
-                play_card(card);
+                play_card(card, &mut player_query);
                 inventory_resource.cards.remove(card.id as usize);
             }
         }
         return;
     }
-    
 
     if let Some(world_position) = window
         .cursor_position()
@@ -111,7 +112,7 @@ pub fn card_handler(
             if btn.just_pressed(MouseButton::Left) {
                 for (_, _, _, card) in card_query.iter() {
                     if card.id == closest_card {
-                        play_card(card);
+                        play_card(card, &mut player_query);
 
                         inventory_resource.cards.remove(card.id as usize);
                     }
@@ -154,16 +155,21 @@ fn find_closest_card<'a>(
     return -1;
 }
 
-fn play_projectile_card(card: &Card) {
+fn play_projectile_card(card: &Card, player_query: &mut Query<&mut HP, With<Player>>) {
     println!("play projectile card");
+    let mut hp = player_query.get_single_mut().unwrap();
+    hp.hp -= 10;
 }
-fn play_melee_card(card: &Card) {
+fn play_melee_card(card: &Card, player_query: &mut Query<&mut HP, With<Player>>) {
     println!("play melee card");
+    let mut hp = player_query.get_single_mut().unwrap();
+    hp.hp -= 10;
 }
-fn play_card(card: &Card) {
+fn play_card(card: &Card, player_query: &mut Query<&mut HP, With<Player>>) {
+    // temp
     match card.card_type {
-        CardType::Melee => play_melee_card(card),
-        CardType::Projectile => play_projectile_card(card),
+        CardType::Melee => play_melee_card(card, player_query),
+        CardType::Projectile => play_projectile_card(card, player_query),
     }
 }
 
@@ -174,7 +180,6 @@ pub fn inventory_changed(
     card_query: Query<Entity, With<Card>>,
 ) {
     if inventory_resource.is_changed() && inventory_resource.cards.len() == 3 {
-        println!("{:?}", inventory_resource);
         for entity in card_query.iter() {
             commands.entity(entity).despawn();
         }
