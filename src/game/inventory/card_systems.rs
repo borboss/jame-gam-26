@@ -71,7 +71,7 @@ pub fn card_handler(
     btn: Res<Input<MouseButton>>,
     keys: Res<Input<KeyCode>>,
     mut inventory_resource: ResMut<Inventory>,
-    mut MP: ResMut<MP>
+    mut mp: ResMut<MP>
 ) {
     let window: &Window = window_query.get_single().unwrap();
     let (camera_transform, camera) = camera_query.single_mut();
@@ -87,7 +87,7 @@ pub fn card_handler(
         }
         for (_, _, _, card) in card_query.iter() {
             if id == card.id {
-                play_card(card, &mut MP);
+                play_card(card, &mut mp);
                 inventory_resource.cards.remove(card.id as usize);
             }
         }
@@ -112,7 +112,7 @@ pub fn card_handler(
             if btn.just_pressed(MouseButton::Left) {
                 for (_, _, _, card) in card_query.iter() {
                     if card.id == closest_card {
-                        play_card(card, &mut MP);
+                        play_card(card, &mut mp);
 
                         inventory_resource.cards.remove(card.id as usize);
                     }
@@ -155,19 +155,19 @@ fn find_closest_card<'a>(
     return -1;
 }
 
-fn play_projectile_card(card: &Card, mut MP: &mut ResMut<MP>) {
+fn play_projectile_card(card: &Card, mp: &mut ResMut<MP>) {
     println!("play projectile card");
-    MP.mp -= 10;
+    mp.mp -= 10;
 }
-fn play_melee_card(card: &Card, mut MP: &mut ResMut<MP>) {
+fn play_melee_card(card: &Card, mp: &mut ResMut<MP>) {
     println!("play melee card");
-    MP.mp -= 10;
+    mp.mp -= 10;
 }
-fn play_card(card: &Card, mut MP: &mut ResMut<MP>) {
+fn play_card(card: &Card, mp: &mut ResMut<MP>) {
     // temp
     match card.card_type {
-        CardType::Melee => play_melee_card(card, MP),
-        CardType::Projectile => play_projectile_card(card, MP),
+        CardType::Melee => play_melee_card(card, mp),
+        CardType::Projectile => play_projectile_card(card, mp),
     }
 }
 
