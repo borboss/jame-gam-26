@@ -1,12 +1,15 @@
+use bevy::prelude::*;
+
 pub mod components;
 mod systems;
 
 use components::*;
 use systems::*;
 
-pub struct EnemyPlugin {}
+pub struct EnemyPlugin;
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
-        app;
+        app
+        .add_system(animate_sprite);
     }
 }

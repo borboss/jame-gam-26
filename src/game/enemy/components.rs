@@ -1,6 +1,6 @@
 use bevy::prelude::Component;
 
-#[derive[Component, default]]
+#[derive(Component, Default)]
 pub struct Enemy {
     pub health:i32,
     pub max_health:i32,
@@ -9,7 +9,7 @@ pub struct Enemy {
 }
 
 #[derive(Default)]
-enum EnemyType {
+pub enum EnemyType {
     #[default] Other, // Other in any type will crash the game. Do not instantiate anything with an Other type.
     Swordsman,
     Archer,

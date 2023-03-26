@@ -4,10 +4,12 @@ pub mod player;
 mod inventory;
 mod stat_bar;
 pub mod attacks;
+mod enemy;
 
 use stat_bar::*;
 use player::*;
 use inventory::*;
+use enemy::*;
 
 use self::attacks::AttackPlugin;
 
@@ -19,7 +21,8 @@ impl Plugin for GamePlugin {
         .add_plugin(PlayerPlugin)
         .add_plugin(InventoryPlugin)
         .add_plugin(StatBarPlugin)
-        .add_plugin(AttackPlugin);
+        .add_plugin(AttackPlugin)
+        .add_plugin(EnemyPlugin);
     }
 }
 
