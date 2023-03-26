@@ -26,7 +26,7 @@ pub fn init_render_bar(mut commands: Commands, window_query: Query<&Window, With
             custom_size: Some(Vec2::new(250.0, 12.5)),
             ..default()
         },
-        transform: Transform::from_xyz(window.width() / 2.0, window.height() - 25.0, 9.9f32),
+        transform: Transform::from_xyz(window.width() / 2.0, window.height() - 25.0, 9.8f32),
         ..default()
     },)); // < Base to see it better
 
@@ -50,7 +50,7 @@ pub fn init_render_bar(mut commands: Commands, window_query: Query<&Window, With
             custom_size: Some(Vec2::new(250.0, 12.5)),
             ..default()
         },
-        transform: Transform::from_xyz(window.width() / 2.0, window.height() - 50.0, 9.9f32),
+        transform: Transform::from_xyz(window.width() / 2.0, window.height() - 50.0, 9.8f32),
         ..default()
     },)); // < Base to see it better
 }

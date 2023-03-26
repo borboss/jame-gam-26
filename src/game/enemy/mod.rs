@@ -10,6 +10,9 @@ pub struct EnemyPlugin;
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
         app
-        .add_system(animate_sprite);
+        .init_resource::<EnemySpawnTimer>()
+        .add_system(animate_sprite)
+        .add_system(spawn_enemies_time.before(tick_enemy_spawn_timer))
+        .add_system(tick_enemy_spawn_timer);
     }
 }

@@ -15,9 +15,10 @@ impl Plugin for PlayerPlugin {
         .init_resource::<HP>()
         .init_resource::<MP>()
         .init_resource::<PlayerPosition>()
-        .add_startup_system(spawn_player)
-        .add_system(move_player.before(confine_player_movement))
-        .add_system(confine_player_movement);
+        .add_startup_system(spawn_player);
+    // player is stationary
+        //.add_system(move_player.before(confine_player_movement))
+        //.add_system(confine_player_movement);
     
     }
 }

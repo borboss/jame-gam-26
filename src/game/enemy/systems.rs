@@ -1,10 +1,13 @@
 use bevy::prelude::*;
+use rand::random;
+
+use super::components::*;
 
 pub fn spawn_enemy(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
-    position: Vec2,
+    commands: &mut Commands,
+    asset_server: &Res<AssetServer>,
+    texture_atlases: &mut ResMut<Assets<TextureAtlas>>,
+    position: &Vec2,
 ) {
     let texture_handle = asset_server.load("sprites/enemies-Sheet.png");
     let texture_atlas =
@@ -18,19 +21,17 @@ pub fn spawn_enemy(
                 .with_scale(Vec3::new(2.5, 2.5, 2.5)),
             ..default()
         },
-        AnimationIndices { first: 1, last: 3 },
+        AnimationIndices { first: 1, last: 2 },
         AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
+        Enemy {
+                direction: Vec3::ZERO,
+                health: 25,
+                max_health: 25,
+                speed: 100,
+                enemy_type: EnemyType::Swordsman,
+            },
     ));
 }
-
-#[derive(Component)]
-pub struct AnimationIndices {
-    first: usize,
-    last: usize,
-}
-
-#[derive(Component, Deref, DerefMut)]
-pub struct AnimationTimer(Timer);
 
 pub fn animate_sprite(
     time: Res<Time>,
@@ -52,3 +53,26 @@ pub fn animate_sprite(
     }
 }
 
+pub fn tick_enemy_spawn_timer(mut enemy_spawn_timer: ResMut<EnemySpawnTimer>, time: Res<Time>) {
+    enemy_spawn_timer.timer.tick(time.delta());
+}
+
+pub const POSITIONS:[Vec2; 2] = [Vec2::new(930.0, 230.0), Vec2::new(30.0, 230.0)];
+
+pub fn spawn_enemies_time(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    spawn_timer: Res<EnemySpawnTimer>,
+    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+) {
+    if spawn_timer.timer.finished() {
+
+        let random_side: Vec2;
+        let weight = random::<f32>();
+        random_side = POSITIONS[weight.round() as usize];
+
+        let random_position: Vec2 = Vec2::new(random::<f32>() * 20.0 + random_side.x, random::<f32>() * 20.0 + random_side.y);
+
+        spawn_enemy(&mut commands, &asset_server, &mut texture_atlases, &random_position);
+    }
+}
