@@ -9,6 +9,8 @@ use stat_bar::*;
 use player::*;
 use inventory::*;
 
+use self::attacks::AttackPlugin;
+
 
 pub struct GamePlugin;
 impl Plugin for GamePlugin {
@@ -16,7 +18,8 @@ impl Plugin for GamePlugin {
         app
         .add_plugin(PlayerPlugin)
         .add_plugin(InventoryPlugin)
-        .add_plugin(StatBarPlugin);
+        .add_plugin(StatBarPlugin)
+        .add_plugin(AttackPlugin);
     }
 }
 
