@@ -1,11 +1,10 @@
-use bevy::{prelude::*, window::PrimaryWindow};
+use bevy::prelude::*;
 
 use crate::game::player::components::{HP, MP};
 
 use super::components::*;
 
-pub fn init_render_bar(mut commands: Commands, window_query: Query<&Window, With<PrimaryWindow>>) {
-    let window: &Window = window_query.get_single().unwrap();
+pub fn init_render_bar(mut commands: Commands) {
     // HP
     commands.spawn((
         SpriteBundle {
@@ -14,7 +13,7 @@ pub fn init_render_bar(mut commands: Commands, window_query: Query<&Window, With
                 custom_size: Some(Vec2::new(250.0, 12.5)),
                 ..default()
             },
-            transform: Transform::from_xyz(window.width() / 2.0, window.height() - 25.0, 9.9f32),
+            transform: Transform::from_xyz(960.0 / 2.0, 540.0 - 25.0, 3.0),
             ..default()
         },
         StatusBar {},
@@ -26,7 +25,7 @@ pub fn init_render_bar(mut commands: Commands, window_query: Query<&Window, With
             custom_size: Some(Vec2::new(250.0, 12.5)),
             ..default()
         },
-        transform: Transform::from_xyz(window.width() / 2.0, window.height() - 25.0, 9.8f32),
+        transform: Transform::from_xyz(960.0 / 2.0, 540.0 - 25.0, 2.0),
         ..default()
     },)); // < Base to see it better
 
@@ -38,7 +37,7 @@ pub fn init_render_bar(mut commands: Commands, window_query: Query<&Window, With
                 custom_size: Some(Vec2::new(250.0, 12.5)),
                 ..default()
             },
-            transform: Transform::from_xyz(window.width() / 2.0, window.height() - 50.0, 9.9f32),
+            transform: Transform::from_xyz(960.0 / 2.0, 540.0 - 50.0, 3.0),
             ..default()
         },
         StatusBar {},
@@ -50,7 +49,7 @@ pub fn init_render_bar(mut commands: Commands, window_query: Query<&Window, With
             custom_size: Some(Vec2::new(250.0, 12.5)),
             ..default()
         },
-        transform: Transform::from_xyz(window.width() / 2.0, window.height() - 50.0, 9.8f32),
+        transform: Transform::from_xyz(960.0 / 2.0, 540.0 - 50.0, 2.0),
         ..default()
     },)); // < Base to see it better
 }

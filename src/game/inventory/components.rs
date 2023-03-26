@@ -1,4 +1,4 @@
-use bevy::prelude::{Component, Resource};
+use bevy::prelude::Resource;
 
 use super::card_components::Card;
 

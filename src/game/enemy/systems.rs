@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use rand::random;
 
-use crate::game::player::components::PlayerPosition;
+use crate::game::player::components::{PlayerPosition, HP};
 
 use super::components::*;
 
@@ -13,17 +13,21 @@ pub fn spawn_enemy(
 ) {
     let texture_handle = asset_server.load("sprites/enemies-Sheet.png");
     let texture_atlas =
-        TextureAtlas::from_grid(texture_handle, Vec2::new(24.0, 24.0), 3, 1, None, None);
+        TextureAtlas::from_grid(texture_handle, Vec2::new(24.0, 24.0), 3, 2, None, None);
     let texture_atlas_handle = texture_atlases.add(texture_atlas);
     commands.spawn((
         SpriteSheetBundle {
             texture_atlas: texture_atlas_handle,
             sprite: TextureAtlasSprite::new(1),
-            transform: Transform::from_translation(Vec3::new(position.x, position.y, 9.0))
+            transform: Transform::from_translation(Vec3::new(position.x, position.y, 8.0))
                 .with_scale(Vec3::new(2.5, 2.5, 2.5)),
             ..default()
         },
-        AnimationIndices { first: 1, last: 2 },
+        AnimationIndices {
+            first: 0,
+            last: 2,
+            delete_on_end: false,
+        },
         AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
         Enemy {
             direction: Vec3::ZERO,
@@ -31,22 +35,42 @@ pub fn spawn_enemy(
             max_health: 25,
             speed: 50.0,
             enemy_type: EnemyType::Swordsman,
+            state: EnemyState::Moving,
+            attack_active: false,
         },
     ));
 }
 
-pub fn animate_sprite(
+pub fn animate_enemy_sprite(
     time: Res<Time>,
-    mut query: Query<(
-        &AnimationIndices,
-        &mut AnimationTimer,
-        &mut TextureAtlasSprite,
-    )>,
+    mut query: Query<
+        (
+            &mut AnimationIndices,
+            &mut AnimationTimer,
+            &mut TextureAtlasSprite,
+            &Enemy,
+        ),
+        With<Enemy>,
+    >,
 ) {
-    for (indices, mut timer, mut sprite) in &mut query {
+    for (mut indices, mut timer, mut sprite, enemy) in &mut query {
         timer.tick(time.delta());
         if timer.just_finished() {
-            sprite.index = if sprite.index == indices.last {
+            match enemy.state {
+                EnemyState::Attacking => {
+                    indices.first = 3;
+                    indices.last = 5;
+                }
+                EnemyState::Moving => {
+                    indices.first = 0;
+                    indices.last = 2;
+                }
+                EnemyState::AttackPossible => {
+                    indices.first = 3;
+                    indices.last = 5;
+                }
+            }
+            sprite.index = if sprite.index == 5 || sprite.index == 2 {
                 indices.first
             } else {
                 sprite.index + 1
@@ -87,18 +111,146 @@ pub fn spawn_enemies_time(
 }
 
 pub fn move_enemy(
-    mut query: Query<(&Enemy, &mut Transform), With<Enemy>>,
-    time: Res<Time>,
+    mut commands: Commands,
+    mut query: Query<(Entity, &mut Enemy, &mut Transform, &mut TextureAtlasSprite), With<Enemy>>,
     player_position: Res<PlayerPosition>,
+    time: Res<Time>,
+    mut hp: ResMut<HP>,
+    asset_server: Res<AssetServer>,
+    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) {
-    for (enemy, mut transform) in query.iter_mut() {
-        let direction: Vec3 = Vec3::new(
-            player_position.position.x - transform.translation.x,
-            player_position.position.y - transform.translation.y,
-            0.0f32,
-        )
-        .normalize();
+    let num_enemies = query.iter().count();
+    let radius = 50.0; // adjust this to change the radius around the player
 
-        transform.translation += direction * enemy.speed * time.delta_seconds();
+    if num_enemies > 0 {
+        let angle_step = 2.0 * std::f32::consts::PI / (num_enemies as f32);
+        let mut angle: f32 = 0.0;
+
+        for (entity, mut enemy, mut transform, mut sprite) in query.iter_mut() {
+            /*
+            2.0 Attacks (Upper Half of Screen)
+            1.4 Enemies (Upper Half of Screen)
+            1.0 is Player
+            0.95 is Attacks (Lower Half of Screen)
+            0.9 is Enemies (Lower Half of Screen)
+            */
+            if transform.translation.y < 540.0 / 2.0 {
+                transform.translation.z = 1.4;
+            } else {
+                transform.translation.z = 0.9;
+            }
+
+            let speed = enemy.speed; // adjust this to change the enemy speed
+            let target_position = player_position.position
+                + Vec3::new(radius * angle.cos(), radius * angle.sin(), 0.0);
+            let direction = (target_position - transform.translation).normalize();
+
+            let distance_to_target = (target_position - transform.translation).length();
+
+            if distance_to_target < 10.0 {
+                transform.translation = target_position;
+                // if attack possible -> attack, spawn attack, attack active, damage player. Once attack not active, then attack not active
+                // if attacking -> check if active
+                match enemy.state {
+                    EnemyState::AttackPossible => {
+                        hp.hp -= 5;
+                        commands
+                            .entity(entity)
+                            .insert(CooldownTimer(Timer::from_seconds(5.0, TimerMode::Once)));
+
+                        let midpoint = (player_position.position + transform.translation) / 2.0;
+                        let direction = (player_position.position - midpoint).normalize();
+                        let angle: f32 = direction.y.atan2(direction.x);
+
+                        let texture_handle = asset_server.load("sprites/effects/swing-Sheet.png");
+                        let texture_atlas = TextureAtlas::from_grid(
+                            texture_handle,
+                            Vec2::new(39.0, 16.0),
+                            5,
+                            1,
+                            None,
+                            None,
+                        );
+                        let texture_atlas_handle = texture_atlases.add(texture_atlas);
+                        commands.spawn((
+                            SpriteSheetBundle {
+                                texture_atlas: texture_atlas_handle,
+                                sprite: TextureAtlasSprite::new(0),
+                                transform: Transform::from_translation(Vec3::new(
+                                    midpoint.x, midpoint.y, 1.75,
+                                ))
+                                .with_scale(Vec3::splat(2.5))
+                                .with_rotation(Quat::from_rotation_z(angle + 90.0)),
+                                ..default()
+                            },
+                            AnimationIndices {
+                                first: 0,
+                                last: 4,
+                                delete_on_end: true,
+                            },
+                            AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
+                        ));
+                        enemy.state = EnemyState::Attacking;
+                    }
+                    EnemyState::Attacking => {}
+                    EnemyState::Moving => {
+                        enemy.state = EnemyState::AttackPossible;
+                    }
+                }
+            } else {
+                enemy.state = EnemyState::Moving;
+                transform.translation += direction * speed * time.delta_seconds();
+            }
+            if transform.translation.x < player_position.position.x {
+                sprite.flip_x = true; // flip the sprite horizontally
+            } else {
+                sprite.flip_x = false; // don't flip the sprite
+            }
+
+            angle += angle_step;
+        }
+    }
+}
+
+pub fn cooldown_manager(
+    mut commands: Commands,
+    mut query: Query<(Entity, &mut Enemy, &mut CooldownTimer), With<CooldownTimer>>,
+    time: Res<Time>,
+) {
+    for (entity, mut enemy, mut timer) in query.iter_mut() {
+        timer.tick(time.delta());
+        if timer.just_finished() {
+            enemy.state = EnemyState::AttackPossible;
+            commands.entity(entity).remove::<CooldownTimer>();
+        }
+    }
+}
+
+pub fn animate_sprites(
+    time: Res<Time>,
+    mut commands: Commands,
+    mut query: Query<
+        (
+            Entity,
+            &AnimationIndices,
+            &mut AnimationTimer,
+            &mut TextureAtlasSprite,
+        ),
+        Without<Enemy>,
+    >,
+) {
+    for (entity, indices, mut timer, mut sprite) in query.iter_mut() {
+        timer.tick(time.delta());
+        if timer.just_finished() {
+            if sprite.index == indices.last {
+                if indices.delete_on_end {
+                    commands.entity(entity).despawn();
+                } else {
+                    sprite.index = indices.first;
+                }
+            } else {
+                sprite.index = sprite.index + 1;
+            };
+        }
     }
 }

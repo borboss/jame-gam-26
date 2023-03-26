@@ -35,9 +35,11 @@ pub const HOVER_POSITIONS: [Vec3; 3] = [
             9.01: Card1
             9.02: Card2
             9.03: Card3
+    2.0 Attacks (Upper Half of Screen)
+    1.4 Enemies (Upper Half of Screen)
     1.0 is Player
-    0.91 is Attacks
-    0.9 is Enemies
+    0.95 is Attacks (Lower Half of Screen)
+    0.9 is Enemies (Lower Half of Screen)
     0.0 is Background
 */
 
@@ -197,7 +199,7 @@ fn play_card(
                             transform: Transform::from_translation(Vec3::new(
                                 player_position.x,
                                 player_position.y,
-                                5.0,
+                                9.0,
                             ))
                             .with_scale(Vec3::new(5.0f32, 5.0f32, 1.0f32)),
                             ..default()
@@ -221,7 +223,7 @@ fn play_card(
                             transform: Transform::from_translation(Vec3::new(
                                 player_position.x,
                                 player_position.y,
-                                5.0,
+                                9.0,
                             ))
                             .with_scale(Vec3::new(5.0f32, 5.0f32, 1.0f32)),
                             ..default()

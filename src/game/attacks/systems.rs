@@ -36,6 +36,19 @@ pub fn move_projectile(
     for (entity, mut projectile_transform, mut spawned_projectile, mut sprite) in
         projectile_query.iter_mut()
     {
+                    /*
+            2.0 Attacks (Upper Half of Screen)
+            1.4 Enemies (Upper Half of Screen)
+            1.0 is Player
+            0.95 is Attacks (Lower Half of Screen)
+            0.9 is Enemies (Lower Half of Screen)
+            */
+            if projectile_transform.translation.y < 540.0 / 2.0 {
+                projectile_transform.translation.z = 2.0;
+            } else {
+                projectile_transform.translation.z = 0.95;
+            }
+
         let direction: Vec3 = Vec3::new(
             spawned_projectile.direction.x,
             spawned_projectile.direction.y,
