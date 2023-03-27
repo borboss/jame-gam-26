@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::game::player::components::{HP, MP};
+use crate::game::{player::components::{HP, MP}, attacks::components::SpawnedProjectile};
 
 use super::components::*;
 
