@@ -1,7 +1,10 @@
 use bevy::{prelude::*, transform};
 use rand::random;
 
-use crate::game::{player::components::{PlayerPosition, HP}, attacks::components::DamageEnemy};
+use crate::game::{
+    attacks::components::{DamageEnemy, SpawnedProjectile},
+    player::components::{PlayerPosition, HP},
+};
 
 use super::components::*;
 
@@ -317,7 +320,8 @@ pub fn archer_handler(
                         let direction = (player_position.position - midpoint).normalize();
                         let angle: f32 = direction.y.atan2(direction.x);
 
-                        let texture_handle = asset_server.load("sprites/effects/bow-shoot-Sheet.png");
+                        let texture_handle =
+                            asset_server.load("sprites/effects/bow-shoot-Sheet.png");
                         let texture_atlas = TextureAtlas::from_grid(
                             texture_handle,
                             Vec2::new(39.0, 16.0),
@@ -332,7 +336,9 @@ pub fn archer_handler(
                                 texture_atlas: texture_atlas_handle,
                                 sprite: TextureAtlasSprite::new(0),
                                 transform: Transform::from_translation(Vec3::new(
-                                    midmidpoint.x, midmidpoint.y, 1.75,
+                                    midmidpoint.x,
+                                    midmidpoint.y,
+                                    1.75,
                                 ))
                                 .with_scale(Vec3::splat(2.5))
                                 .with_rotation(Quat::from_rotation_z(angle + 90.0)),
@@ -356,7 +362,6 @@ pub fn archer_handler(
                 enemy.state = EnemyState::Moving;
                 transform.translation += direction * speed * time.delta_seconds();
             }
-
 
             angle += angle_step;
         }
@@ -406,19 +411,25 @@ pub fn animate_sprites(
     }
 }
 
-use bevy::sprite::collide_aabb::collide;
+pub fn enemy_death_handler(
+    mut commands: Commands,
+    mut enemy_query: Query<(&mut Enemy, &Transform, Entity), With<Enemy>>,
+    projectile_query: Query<(&Transform, &SpawnedProjectile), With<DamageEnemy>>,
+) {
+    for (projectile_transform, projectile_info) in projectile_query.iter() {
+        for (mut enemy, enemy_transform, entity) in enemy_query.iter_mut() {
+            if projectile_info.x_radius
+                > (projectile_transform.translation.x - enemy_transform.translation.x).abs()
+                && projectile_info.y_radius
+                    > (projectile_transform.translation.y - enemy_transform.translation.y.abs())
+            {
+                println!("hit");
+                enemy.health -= projectile_info.damage;
+            }
 
-pub fn enemy_death_handler(mut commands: Commands, enemy_query: Query<(Entity, &Transform, &Sprite), With<Enemy>>, projectile_query: Query<(&Transform, &Sprite), With<DamageEnemy>>) {
-    for (entity, enemy_transform, enemy_sprite) in enemy_query.iter() {
-        for (projectile_transform, projectile_sprite) in projectile_query.iter() {
-            let collision = collide(
-                enemy_transform.translation,
-                enemy_transform.scale.truncate(),
-                projectile_transform.translation,
-                projectile_transform.scale.truncate(),
-            );
-            if let Some(collision) = collision {
-                println!("Collision!");
+            if enemy.health <= 0 {
+                // TODO: death animation.
+                commands.entity(entity).despawn();
             }
         }
     }

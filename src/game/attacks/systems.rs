@@ -1,6 +1,4 @@
 use bevy::prelude::*;
-
-use bevy_tweening::Lerp;
 use super::components::*;
 
 
@@ -8,7 +6,7 @@ use super::components::*;
 pub fn move_projectile(
     mut commands: Commands,
     mut projectile_query: Query<
-        (Entity, &mut Transform, &mut SpawnedProjectile, &mut Sprite),
+        (Entity, &mut Transform, &mut SpawnedProjectile, &mut TextureAtlasSprite),
         With<SpawnedProjectile>,
     >,
     time: Res<Time>,

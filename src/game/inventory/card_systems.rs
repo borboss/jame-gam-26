@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy_tweening::Lerp;
-use rand::random;
+use rand::{random, thread_rng, Rng};
 
 use crate::game::attacks::components::DamageEnemy;
 use crate::game::enemy::components::{AnimationTimer, AnimationIndices};
@@ -180,22 +180,48 @@ pub fn play_card(
         match &card.card_type {
             CardType::Melee(melee_type) => {
                 mp.mp += card.cost as i32;
-                mp.mp = mp.mp.clamp(0, 100);
+                mp.mp = mp.mp.clamp(0, mp.max_mp);
                 match melee_type {
                     MeleeType::Stomp => {
+                        let tile_size = Vec2::new(64.0, 64.0);
+                        let texture_handle = asset_server.load("sprites/projectiles/stomp.png");
+                        let texture_atlas = TextureAtlas::from_grid(
+                            texture_handle,
+                            tile_size,
+                            4,
+                            1,
+                            None,
+                            None,
+                        ); 
+                        let texture_atlas_handle = texture_atlases.add(texture_atlas);
                         println!("Melee/Stomp played");
                         commands.spawn((
-                            SpriteBundle {
-                                texture: asset_server.load("sprites/effects/stomp.png"),
+                            SpriteSheetBundle {
+                                texture_atlas: texture_atlas_handle,
+                                sprite: TextureAtlasSprite::new(0),
                                 transform: Transform::from_translation(Vec3::new(
                                     player_position.position.x,
                                     player_position.position.y,
                                     9.0,
                                 ))
-                                .with_scale(Vec3::new(5.0f32, 5.0f32, 1.0f32)),
+                                .with_scale(Vec3::new(2.5f32, 2.5f32, 2.5f32)),
                                 ..default()
                             },
+                            SpawnedProjectile {
+                                direction: Vec2::ZERO,
+                                total_bounces: 0,
+                                max_bounces: 1,
+                                x_radius: tile_size.x,
+                                y_radius: tile_size.y,
+                                damage: 3,
+                            },
                             DamageEnemy {},
+                            AnimationIndices {
+                                first: 0,
+                                last: 3,
+                                delete_on_end: true,
+                            },
+                            AnimationTimer(Timer::from_seconds(0.5, TimerMode::Repeating)),
                         ));
                     }
                     MeleeType::Other => panic!("No card should have meleetype other."),
@@ -203,19 +229,21 @@ pub fn play_card(
             }
             CardType::Projectile(projectile_type) => {
                 mp.mp -= card.cost as i32;
-                mp.mp = mp.mp.clamp(0, 100);
+                mp.mp = mp.mp.clamp(0, mp.max_mp);
                 match projectile_type {
                     ProjectileType::Fireball => {
+                        let tile_size = Vec2::new(64.0, 32.0);
                         let texture_handle = asset_server.load("sprites/projectiles/fireball.png");
                         let texture_atlas = TextureAtlas::from_grid(
                             texture_handle,
-                            Vec2::new(192.0, 32.0),
+                            tile_size,
                             3,
                             1,
                             None,
                             None,
                         ); 
                         let texture_atlas_handle = texture_atlases.add(texture_atlas);
+                        let mut rng = thread_rng();
                         println!("Projectile/Fireball played");
                         commands.spawn((
                             SpriteSheetBundle {
@@ -230,9 +258,12 @@ pub fn play_card(
                                 ..default()
                             },
                             SpawnedProjectile {
-                                direction: Vec2::new(random::<f32>(), random::<f32>()).normalize(),
+                                direction: Vec2::new(rng.gen_range(-1.0..=1.0), rng.gen_range(-1.0..=1.0)).normalize(),
                                 total_bounces: 0,
                                 max_bounces: 5,
+                                x_radius: 25.0,
+                                y_radius: 5.0,
+                                damage: 3,
                             },
                             DamageEnemy {},
                             AnimationIndices {
