@@ -17,11 +17,19 @@ impl Plugin for InventoryPlugin {
         app
             .init_resource::<Inventory>()
             .add_plugin(TweeningPlugin)
-            .add_startup_system(init_inventory.before(init_render_cards))
-            .add_startup_system(init_render_cards)
-            .add_system(maintain_inventory)
-            .add_system(card_handler)
-            .add_system(play_card)
-            .add_system(inventory_changed);
+            .add_systems(
+                (
+                    init_inventory.before(init_render_cards),
+                    init_render_cards,
+                ).in_set(OnEnter(GameState::InGame))
+            )
+            .add_systems(
+                (
+                maintain_inventory,
+                card_handler,
+                play_card,
+                inventory_changed,
+                ).in_set(OnUpdate(GameState::InGame))
+            );
     }
 }

@@ -17,7 +17,9 @@ impl Plugin for PlayerPlugin {
         app.init_resource::<HP>()
             .init_resource::<MP>()
             .init_resource::<PlayerPosition>()
-            .add_startup_system(spawn_player.in_schedule(OnEnter(GameState::InGame))); // player is stationary
+            .add_systems((
+                spawn_player
+            ).in_schedule(OnEnter(GameState:InGame))); // player is stationary
                                                //.add_system(move_player.before(confine_player_movement))
                                                //.add_system(confine_player_movement);
     }

@@ -10,6 +10,8 @@ pub struct AttackPlugin;
 
 impl Plugin for AttackPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(move_projectile.run_if(in_state(GameState::InGame)));
+        app.add_systems(
+            (move_projectile)
+        ).in_set(OnUpdate(GameState::InGame));
     }
 }
