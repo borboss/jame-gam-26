@@ -1,25 +1,9 @@
 use bevy::prelude::*;
 
 use bevy_tweening::Lerp;
-
 use super::components::*;
 
-pub fn fader(
-    mut commands: Commands,
-    mut fader_query: Query<(Entity, &mut Sprite, &FadeSoon), With<FadeSoon>>,
-    time: Res<Time>,
-) {
-    for (entity, mut sprite, fade_component) in fader_query.iter_mut() {
-        let a = sprite.color.a();
-        sprite.color.set_a(a.lerp(
-            &0.0f32,
-            &(time.delta_seconds() / fade_component.time as f32),
-        ));
-        if sprite.color.a() <= 1.0 {
-            commands.entity(entity).despawn();
-        }
-    }
-}
+
 
 pub fn move_projectile(
     mut commands: Commands,

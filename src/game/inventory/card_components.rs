@@ -23,7 +23,7 @@ impl Default for Card {
 }
 
 #[derive(Component)]
-pub struct InInventory {}
+pub struct InInventory;
 
 #[derive(Default, Clone, Copy, Debug)]
 pub enum CardType {
@@ -42,3 +42,6 @@ pub enum ProjectileType {
     Fireball,
     #[default] Other,
 }
+
+#[derive(Component)]
+pub struct MarkedForPlaying;

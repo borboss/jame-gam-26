@@ -10,8 +10,5 @@ pub struct SpawnedProjectile {
 pub struct DamageEnemy {}
 #[derive(Component)]
 pub struct DamagePlayer {}
-#[derive(Component)]
-pub struct FadeSoon {
-    pub time: u8,
-}
+
  

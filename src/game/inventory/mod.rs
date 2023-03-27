@@ -19,8 +19,9 @@ impl Plugin for InventoryPlugin {
             .add_plugin(TweeningPlugin)
             .add_startup_system(init_inventory.before(init_render_cards))
             .add_startup_system(init_render_cards)
-            .add_system(maintain_inventory.before(card_handler))
-            .add_system(card_handler.after(maintain_inventory))
-            .add_system(inventory_changed.after(card_handler));
+            .add_system(maintain_inventory)
+            .add_system(card_handler)
+            .add_system(play_card)
+            .add_system(inventory_changed);
     }
 }

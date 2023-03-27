@@ -3,12 +3,13 @@ use bevy::window::PrimaryWindow;
 use bevy_tweening::Lerp;
 use rand::random;
 
-use crate::game::attacks::components::{DamageEnemy, FadeSoon};
+use crate::game::attacks::components::DamageEnemy;
+use crate::game::enemy::components::{AnimationTimer, AnimationIndices};
 use crate::game::inventory::components::Inventory;
 use crate::game::player::components::{PlayerPosition, MP};
 use crate::game::{attacks::components::SpawnedProjectile, inventory::card_components::Card};
 
-use super::card_components::{CardType, MeleeType, ProjectileType};
+use super::card_components::{CardType, MeleeType, ProjectileType, MarkedForPlaying};
 
 pub const IDLE_POSITIONS: [Vec3; 3] = [
     Vec3::new(75.0, 90.0, 9.01),
@@ -79,10 +80,7 @@ pub fn card_handler(
     btn: Res<Input<MouseButton>>,
     keys: Res<Input<KeyCode>>,
     mut inventory_resource: ResMut<Inventory>,
-    mut mp: ResMut<MP>,
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    player_position: Res<PlayerPosition>,
 ) {
     let window: &Window = window_query.get_single().unwrap();
     let (camera_transform, camera) = camera_query.single_mut();
@@ -96,15 +94,9 @@ pub fn card_handler(
         } else if keys.just_released(KeyCode::Key3) {
             id = 2i8;
         }
-        for (_, _, _, card) in card_query.iter() {
+        for (entity, _, _, card) in card_query.iter() {
             if id == card.id {
-                play_card(
-                    card,
-                    &mut mp,
-                    &mut commands,
-                    &asset_server,
-                    &player_position.position,
-                );
+                commands.entity(entity).insert(MarkedForPlaying);
                 inventory_resource.cards.remove(card.id as usize);
             }
         }
@@ -127,16 +119,9 @@ pub fn card_handler(
                 Vec3::new(world_position.x, world_position.y, 9.0f32),
             );
             if btn.just_pressed(MouseButton::Left) {
-                for (_, _, _, card) in card_query.iter() {
+                for (entity, _, _, card) in card_query.iter() {
                     if card.id == closest_card {
-                        play_card(
-                            card,
-                            &mut mp,
-                            &mut commands,
-                            &asset_server,
-                            &player_position.position,
-                        );
-
+                        commands.entity(entity).insert(MarkedForPlaying);
                         inventory_resource.cards.remove(card.id as usize);
                     }
                 }
@@ -178,68 +163,91 @@ fn find_closest_card<'a>(
     return -1;
 }
 
-fn play_card(
-    card: &Card,
-    mp: &mut ResMut<MP>,
-    commands: &mut Commands,
-    asset_server: &Res<AssetServer>,
-    player_position: &Vec3,
+pub fn play_card(
+    card_query: Query<&Card, With<MarkedForPlaying>>,
+    mut mp: ResMut<MP>,
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    player_position: Res<PlayerPosition>,
+    mut texture_atlases: ResMut<Assets<TextureAtlas>>
 ) {
-    // temp
-    match &card.card_type {
-        CardType::Melee(melee_type) => {
-            mp.mp += card.cost as i32;
-            mp.mp = mp.mp.clamp(0, 100);
-            match melee_type {
-                MeleeType::Stomp => {
-                    println!("Melee/Stomp played");
-                    commands.spawn((
-                        SpriteBundle {
-                            texture: asset_server.load("sprites/effects/stomp.png"),
-                            transform: Transform::from_translation(Vec3::new(
-                                player_position.x,
-                                player_position.y,
-                                9.0,
-                            ))
-                            .with_scale(Vec3::new(5.0f32, 5.0f32, 1.0f32)),
-                            ..default()
-                        },
-                        FadeSoon { time: 10 },
-                        DamageEnemy {},
-                    ));
+    // CARDS TODO:
+    // TODO: Make stomp actually work
+    // TODO: Animate stomp to fade, using the enemy modules plugin handler (maybe make this it's own plugin?)
+    // TODO: Make fireball animation play properly (Same as above)
+    // TODO: More attacks.
+    for card in card_query.iter() {
+        match &card.card_type {
+            CardType::Melee(melee_type) => {
+                mp.mp += card.cost as i32;
+                mp.mp = mp.mp.clamp(0, 100);
+                match melee_type {
+                    MeleeType::Stomp => {
+                        println!("Melee/Stomp played");
+                        commands.spawn((
+                            SpriteBundle {
+                                texture: asset_server.load("sprites/effects/stomp.png"),
+                                transform: Transform::from_translation(Vec3::new(
+                                    player_position.position.x,
+                                    player_position.position.y,
+                                    9.0,
+                                ))
+                                .with_scale(Vec3::new(5.0f32, 5.0f32, 1.0f32)),
+                                ..default()
+                            },
+                            DamageEnemy {},
+                        ));
+                    }
+                    MeleeType::Other => panic!("No card should have meleetype other."),
                 }
-                MeleeType::Other => panic!("No card should have meleetype other."),
             }
-        }
-        CardType::Projectile(projectile_type) => {
-            mp.mp -= card.cost as i32;
-            mp.mp = mp.mp.clamp(0, 100);
-            match projectile_type {
-                ProjectileType::Fireball => {
-                    println!("Projectile/Fireball played");
-                    commands.spawn((
-                        SpriteBundle {
-                            texture: asset_server.load("sprites/projectiles/fireball.png"),
-                            transform: Transform::from_translation(Vec3::new(
-                                player_position.x,
-                                player_position.y,
-                                9.0,
-                            ))
-                            .with_scale(Vec3::new(5.0f32, 5.0f32, 1.0f32)),
-                            ..default()
-                        },
-                        SpawnedProjectile {
-                            direction: Vec2::new(random::<f32>(), random::<f32>()).normalize(),
-                            total_bounces: 0,
-                            max_bounces: 5,
-                        },
-                        DamageEnemy {},
-                    ));
+            CardType::Projectile(projectile_type) => {
+                mp.mp -= card.cost as i32;
+                mp.mp = mp.mp.clamp(0, 100);
+                match projectile_type {
+                    ProjectileType::Fireball => {
+                        let texture_handle = asset_server.load("sprites/projectiles/fireball.png");
+                        let texture_atlas = TextureAtlas::from_grid(
+                            texture_handle,
+                            Vec2::new(192.0, 32.0),
+                            3,
+                            1,
+                            None,
+                            None,
+                        ); 
+                        let texture_atlas_handle = texture_atlases.add(texture_atlas);
+                        println!("Projectile/Fireball played");
+                        commands.spawn((
+                            SpriteSheetBundle {
+                                texture_atlas: texture_atlas_handle,
+                                sprite: TextureAtlasSprite::new(0),
+                                transform: Transform::from_translation(Vec3::new(
+                                    player_position.position.x,
+                                    player_position.position.y,
+                                    9.0,
+                                ))
+                                .with_scale(Vec3::new(5.0f32, 5.0f32, 1.0f32)),
+                                ..default()
+                            },
+                            SpawnedProjectile {
+                                direction: Vec2::new(random::<f32>(), random::<f32>()).normalize(),
+                                total_bounces: 0,
+                                max_bounces: 5,
+                            },
+                            DamageEnemy {},
+                            AnimationIndices {
+                                first: 0,
+                                last: 2,
+                                delete_on_end: false,
+                            },
+                            AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
+                        ));
+                    }
+                    ProjectileType::Other => panic!("No card should have projectiletype other."),
                 }
-                ProjectileType::Other => panic!("No card should have projectiletype other."),
             }
+            CardType::Other => panic!("No card should have type other."),
         }
-        CardType::Other => panic!("No card should have type other."),
     }
 }
 

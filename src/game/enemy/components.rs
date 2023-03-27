@@ -9,6 +9,7 @@ pub struct Enemy {
     pub enemy_type: EnemyType,
     pub state: EnemyState,
     pub attack_active: bool,
+    pub damage: i32,
 }
 
 #[derive(Default)]
@@ -58,3 +59,10 @@ pub struct DeleteAfterAnimation {}
 
 #[derive(Component, Deref, DerefMut)]
 pub struct CooldownTimer(pub Timer);
+
+
+#[derive(Component)]
+pub struct SwordsmanMarker {}
+
+#[derive(Component)]
+pub struct ArcherMarker {}
