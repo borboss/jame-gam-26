@@ -7,7 +7,6 @@ use components::*;
 use systems::*;
 
 use crate::AppState;
-
 use super::SimulationState;
 
 pub struct EnemyPlugin;

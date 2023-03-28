@@ -1,3 +1,5 @@
+use std::f32::consts::E;
+
 use bevy::prelude::*;
 use rand::random;
 
@@ -136,7 +138,7 @@ pub fn spawn_enemies_time(
     mut total_enemies: ResMut<TotalEnemySpawns>,
 ) {
     if spawn_timer.timer.finished() {
-        for _ in 0..=((total_enemies.total_spawns as u32 + 1) / 2) {
+        for _ in 0..=(E.powf(total_enemies.total_spawns as f32 / 20.0) as i32) {
             let random_side: Vec2;
             let weight = random::<f32>();
             random_side = POSITIONS[weight.round() as usize];
@@ -152,8 +154,8 @@ pub fn spawn_enemies_time(
                 &mut texture_atlases,
                 &random_position,
             );
-            total_enemies.total_spawns += 1;
         }
+        total_enemies.total_spawns += 1;
     }
 }
 

@@ -35,4 +35,5 @@ pub enum SimulationState {
     #[default]
     Running,
     Paused,
+    GameOver,
 }
