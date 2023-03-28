@@ -14,7 +14,6 @@ fn main() {
         App::new()
         .insert_resource(ClearColor(Color::rgb(9.0/255.0, 13.0/255.0, 30.0/255.0)))
         .add_state::<AppState>()
-        .add_state::<SimulationState>()
         .add_startup_system(spawn_camera)
         .add_startup_system(spawn_background)
         .add_plugins(DefaultPlugins
