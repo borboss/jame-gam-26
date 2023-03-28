@@ -14,4 +14,5 @@ pub struct DamageEnemy {}
 #[derive(Component)]
 pub struct DamagePlayer {}
 
- 
+#[derive(Component)]
+pub struct DontManageZ;

@@ -75,4 +75,3 @@ pub fn update_bars(
         ));
     }
 }
-

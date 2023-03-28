@@ -1,15 +1,22 @@
 mod components;
 mod systems;
 
-use crate::main_menu::components::GameState;
 use bevy::prelude::*;
 use systems::*;
+
+use crate::AppState;
+
+use super::SimulationState;
 
 pub struct StatBarPlugin;
 
 impl Plugin for StatBarPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(init_render_bar)
-            .add_system(update_bars.after(init_render_bar).run_if(in_state(GameState::InGame)));
+        app.add_system(init_render_bar.in_schedule(OnEnter(AppState::Game)))
+            .add_system(
+                update_bars
+                    .in_set(OnUpdate(AppState::Game))
+                    .in_set(OnUpdate(SimulationState::Running)),
+            );
     }
 }

@@ -1,4 +1,4 @@
-use bevy::{prelude::*, transform};
+use bevy::prelude::*;
 use rand::random;
 
 use crate::game::{
@@ -44,7 +44,7 @@ pub fn spawn_enemy(
                 attack_active: false,
                 damage: 1,
             },
-            SwordsmanMarker {},
+            SwordsmanMarker,
         ));
     } else {
         let texture_handle = asset_server.load("sprites/archer-Sheet.png");
@@ -75,7 +75,7 @@ pub fn spawn_enemy(
                 attack_active: false,
                 damage: 1,
             },
-            ArcherMarker {},
+            ArcherMarker,
         ));
     }
 }
@@ -118,7 +118,11 @@ pub fn animate_enemy_sprite(
     }
 }
 
-pub fn tick_enemy_spawn_timer(mut enemy_spawn_timer: ResMut<EnemySpawnTimer>, time: Res<Time>) {
+pub fn tick_enemy_spawn_timer(
+    mut enemy_spawn_timer: ResMut<EnemySpawnTimer>,
+    time: Res<Time>,
+    total_enemies: Res<TotalEnemySpawns>,
+) {
     enemy_spawn_timer.timer.tick(time.delta());
 }
 
@@ -129,23 +133,27 @@ pub fn spawn_enemies_time(
     asset_server: Res<AssetServer>,
     spawn_timer: Res<EnemySpawnTimer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+    mut total_enemies: ResMut<TotalEnemySpawns>,
 ) {
     if spawn_timer.timer.finished() {
-        let random_side: Vec2;
-        let weight = random::<f32>();
-        random_side = POSITIONS[weight.round() as usize];
+        for _ in 0..=((total_enemies.total_spawns as u32 + 1) / 2) {
+            let random_side: Vec2;
+            let weight = random::<f32>();
+            random_side = POSITIONS[weight.round() as usize];
 
-        let random_position: Vec2 = Vec2::new(
-            random::<f32>() * 20.0 + random_side.x,
-            random::<f32>() * 20.0 + random_side.y,
-        );
+            let random_position: Vec2 = Vec2::new(
+                random::<f32>() * 20.0 + random_side.x,
+                random::<f32>() * 30.0 + random_side.y,
+            );
 
-        spawn_enemy(
-            &mut commands,
-            &asset_server,
-            &mut texture_atlases,
-            &random_position,
-        );
+            spawn_enemy(
+                &mut commands,
+                &asset_server,
+                &mut texture_atlases,
+                &random_position,
+            );
+            total_enemies.total_spawns += 1;
+        }
     }
 }
 
@@ -209,7 +217,7 @@ pub fn swordsman_handler(
                         let direction = (player_position.position - midpoint).normalize();
                         let angle: f32 = direction.y.atan2(direction.x);
 
-                        let texture_handle = asset_server.load("sprites/effects/swing-Sheet.png");
+                        let texture_handle = asset_server.load("sprites/effects/swing.png");
                         let texture_atlas = TextureAtlas::from_grid(
                             texture_handle,
                             Vec2::new(39.0, 16.0),
@@ -421,10 +429,10 @@ pub fn enemy_death_handler(
             if projectile_info.x_radius
                 > (projectile_transform.translation.x - enemy_transform.translation.x).abs()
                 && projectile_info.y_radius
-                    > (projectile_transform.translation.y - enemy_transform.translation.y.abs())
+                    > (projectile_transform.translation.y - enemy_transform.translation.y).abs()
             {
-                println!("hit");
                 enemy.health -= projectile_info.damage;
+                commands.entity(entity).despawn();
             }
 
             if enemy.health <= 0 {

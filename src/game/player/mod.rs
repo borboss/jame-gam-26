@@ -1,7 +1,10 @@
-use bevy::prelude::{App, IntoSystemConfig, Plugin, Vec2, IntoSystemAppConfig};
+use bevy::prelude::{App, IntoSystemAppConfig, OnEnter, Plugin, Vec2};
 
 pub mod components;
 mod systems;
+
+
+use crate::AppState;
 
 use self::{
     components::{PlayerPosition, HP, MP},
@@ -17,10 +20,8 @@ impl Plugin for PlayerPlugin {
         app.init_resource::<HP>()
             .init_resource::<MP>()
             .init_resource::<PlayerPosition>()
-            .add_systems((
-                spawn_player
-            ).in_schedule(OnEnter(GameState:InGame))); // player is stationary
-                                               //.add_system(move_player.before(confine_player_movement))
-                                               //.add_system(confine_player_movement);
+            .add_system(spawn_player.in_schedule(OnEnter(AppState::Game))); // player is stationary
+                                                                               //.add_system(move_player.before(confine_player_movement))
+                                                                               //.add_system(confine_player_movement);
     }
 }

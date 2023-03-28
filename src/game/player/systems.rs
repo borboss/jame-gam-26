@@ -1,4 +1,4 @@
-use bevy::{prelude::*, window::PrimaryWindow};
+use bevy::prelude::*;
 
 use super::components::{Player, HP, MP};
 use super::*;

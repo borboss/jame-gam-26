@@ -1,6 +1,5 @@
 use bevy::prelude::Component;
 use bevy::prelude::Resource;
-use bevy::prelude::States;
 use bevy::prelude::Vec3;
 
 #[derive(Component, Default)]

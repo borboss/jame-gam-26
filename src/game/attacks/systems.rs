@@ -1,12 +1,15 @@
-use bevy::prelude::*;
 use super::components::*;
-
-
+use bevy::prelude::*;
 
 pub fn move_projectile(
     mut commands: Commands,
     mut projectile_query: Query<
-        (Entity, &mut Transform, &mut SpawnedProjectile, &mut TextureAtlasSprite),
+        (
+            Entity,
+            &mut Transform,
+            &mut SpawnedProjectile,
+            &mut TextureAtlasSprite,
+        ),
         With<SpawnedProjectile>,
     >,
     time: Res<Time>,
@@ -18,18 +21,13 @@ pub fn move_projectile(
     for (entity, mut projectile_transform, mut spawned_projectile, mut sprite) in
         projectile_query.iter_mut()
     {
-                    /*
-            2.0 Attacks (Upper Half of Screen)
-            1.4 Enemies (Upper Half of Screen)
-            1.0 is Player
-            0.95 is Attacks (Lower Half of Screen)
-            0.9 is Enemies (Lower Half of Screen)
-            */
-            if projectile_transform.translation.y < 540.0 / 2.0 {
-                projectile_transform.translation.z = 2.0;
-            } else {
-                projectile_transform.translation.z = 0.95;
-            }
+        /*
+        2.0 Attacks (Upper Half of Screen)
+        1.4 Enemies (Upper Half of Screen)
+        1.0 is Player
+        0.95 is Attacks (Lower Half of Screen)
+        0.9 is Enemies (Lower Half of Screen)
+        */
 
         let direction: Vec3 = Vec3::new(
             spawned_projectile.direction.x,
@@ -72,6 +70,16 @@ pub fn move_projectile(
         if spawned_projectile.total_bounces >= spawned_projectile.max_bounces {
             // todo: animate poof
             commands.entity(entity).despawn();
+        }
+    }
+}
+
+pub fn projectile_z_manager(mut projectile_query: Query<&mut Transform, Without<DontManageZ>>) {
+    for mut projectile_transform in projectile_query.iter_mut() {
+        if projectile_transform.translation.y < 540.0 / 2.0 {
+            projectile_transform.translation.z = 2.0;
+        } else {
+            projectile_transform.translation.z = 0.95;
         }
     }
 }

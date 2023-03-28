@@ -62,7 +62,13 @@ pub struct CooldownTimer(pub Timer);
 
 
 #[derive(Component)]
-pub struct SwordsmanMarker {}
+pub struct SwordsmanMarker;
 
 #[derive(Component)]
-pub struct ArcherMarker {}
+pub struct ArcherMarker;
+
+
+#[derive(Resource, Default)]
+pub struct TotalEnemySpawns {
+    pub total_spawns: u64,
+}

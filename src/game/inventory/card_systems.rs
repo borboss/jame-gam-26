@@ -1,15 +1,15 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy_tweening::Lerp;
-use rand::{random, thread_rng, Rng};
+use rand::{thread_rng, Rng, random};
 
-use crate::game::attacks::components::DamageEnemy;
+use crate::game::attacks::components::{DamageEnemy, DontManageZ};
 use crate::game::enemy::components::{AnimationTimer, AnimationIndices};
 use crate::game::inventory::components::Inventory;
-use crate::game::player::components::{PlayerPosition, MP};
+use crate::game::player::components::{PlayerPosition, MP, HP};
 use crate::game::{attacks::components::SpawnedProjectile, inventory::card_components::Card};
 
-use super::card_components::{CardType, MeleeType, ProjectileType, MarkedForPlaying};
+use super::card_components::{CardType, MeleeType, ProjectileType, MarkedForPlaying, BuffType};
 
 pub const IDLE_POSITIONS: [Vec3; 3] = [
     Vec3::new(75.0, 90.0, 9.01),
@@ -26,7 +26,8 @@ pub const HOVER_POSITIONS: [Vec3; 3] = [
 /*
 
     Z-Axis Meanings:
-    10.0 is Camera
+    11.0 is Camera
+    10.0 is UI
     9.0:
         9.1X: Hovered Cards
             9.11: Card1
@@ -61,8 +62,6 @@ pub fn init_render_cards(
             },
             Card {
                 card_type: card.card_type,
-                name: card.name.clone(),
-                description: card.description.clone(),
                 cost: card.cost,
                 sprite_path: card.sprite_path.clone(),
                 id: j as i8,
@@ -144,7 +143,7 @@ fn update_card(
     }
 }
 
-fn find_closest_card<'a>(
+fn find_closest_card(
     card_query: &mut Query<(Entity, &mut Transform, &mut Sprite, &Card), With<Card>>,
     target_position: Vec3,
 ) -> i8 {
@@ -166,15 +165,13 @@ fn find_closest_card<'a>(
 pub fn play_card(
     card_query: Query<&Card, With<MarkedForPlaying>>,
     mut mp: ResMut<MP>,
+    mut hp: ResMut<HP>,
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     player_position: Res<PlayerPosition>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>
 ) {
     // CARDS TODO:
-    // TODO: Make stomp actually work
-    // TODO: Animate stomp to fade, using the enemy modules plugin handler (maybe make this it's own plugin?)
-    // TODO: Make fireball animation play properly (Same as above)
     // TODO: More attacks.
     for card in card_query.iter() {
         match &card.card_type {
@@ -184,7 +181,7 @@ pub fn play_card(
                 match melee_type {
                     MeleeType::Stomp => {
                         let tile_size = Vec2::new(64.0, 64.0);
-                        let texture_handle = asset_server.load("sprites/projectiles/stomp.png");
+                        let texture_handle = asset_server.load("sprites/effects/stomp.png");
                         let texture_atlas = TextureAtlas::from_grid(
                             texture_handle,
                             tile_size,
@@ -194,17 +191,16 @@ pub fn play_card(
                             None,
                         ); 
                         let texture_atlas_handle = texture_atlases.add(texture_atlas);
-                        println!("Melee/Stomp played");
                         commands.spawn((
                             SpriteSheetBundle {
                                 texture_atlas: texture_atlas_handle,
                                 sprite: TextureAtlasSprite::new(0),
                                 transform: Transform::from_translation(Vec3::new(
                                     player_position.position.x,
-                                    player_position.position.y,
-                                    9.0,
+                                    player_position.position.y - 10.0,
+                                    0.95,
                                 ))
-                                .with_scale(Vec3::new(2.5f32, 2.5f32, 2.5f32)),
+                                .with_scale(Vec3::new(2.5f32, 2.5f32, 1.0f32)),
                                 ..default()
                             },
                             SpawnedProjectile {
@@ -222,6 +218,7 @@ pub fn play_card(
                                 delete_on_end: true,
                             },
                             AnimationTimer(Timer::from_seconds(0.5, TimerMode::Repeating)),
+                            DontManageZ,
                         ));
                     }
                     MeleeType::Other => panic!("No card should have meleetype other."),
@@ -244,7 +241,6 @@ pub fn play_card(
                         ); 
                         let texture_atlas_handle = texture_atlases.add(texture_atlas);
                         let mut rng = thread_rng();
-                        println!("Projectile/Fireball played");
                         commands.spawn((
                             SpriteSheetBundle {
                                 texture_atlas: texture_atlas_handle,
@@ -261,8 +257,8 @@ pub fn play_card(
                                 direction: Vec2::new(rng.gen_range(-1.0..=1.0), rng.gen_range(-1.0..=1.0)).normalize(),
                                 total_bounces: 0,
                                 max_bounces: 5,
-                                x_radius: 25.0,
-                                y_radius: 5.0,
+                                x_radius: 50.0,
+                                y_radius: 10.0,
                                 damage: 3,
                             },
                             DamageEnemy {},
@@ -275,6 +271,49 @@ pub fn play_card(
                         ));
                     }
                     ProjectileType::Other => panic!("No card should have projectiletype other."),
+                }
+            }
+            CardType::Buff(buff_type) => {
+                // Animation here does not seem to work.
+                match buff_type {
+                    BuffType::Heal => {
+                     hp.hp += (random::<f32>() * 10.0) as i32;
+                     hp.hp = hp.hp.clamp(0, hp.max_hp);
+
+                     let tile_size = Vec2::new(24.0, 24.0);
+                     let texture_handle = asset_server.load("sprites/effects/player-heal.png");
+                     let texture_atlas = TextureAtlas::from_grid(
+                         texture_handle,
+                         tile_size,
+                         9,
+                         1,
+                         None,
+                         None,
+                     ); 
+                     let texture_atlas_handle = texture_atlases.add(texture_atlas);
+                     commands.spawn((
+                         SpriteSheetBundle {
+                             texture_atlas: texture_atlas_handle,
+                             sprite: TextureAtlasSprite::new(0),
+                             transform: Transform::from_translation(Vec3::new(
+                                 player_position.position.x,
+                                 player_position.position.y,
+                                 0.95,
+                             ))
+                             .with_scale(Vec3::new(2.5f32, 2.5f32, 1.0f32)),
+                             ..default()
+                         },
+                         AnimationIndices {
+                             first: 0,
+                             last: 8,
+                             delete_on_end: true,
+                         },
+                         AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
+                     ));
+
+
+                    }
+                    BuffType::Other => panic!("No card should have any type other."),
                 }
             }
             CardType::Other => panic!("No card should have type other."),

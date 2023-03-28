@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use rand::{rngs::ThreadRng, thread_rng, Rng};
 
 use super::{
-    card_components::{Card, CardType, ProjectileType, MeleeType},
+    card_components::{Card, CardType, ProjectileType, MeleeType, BuffType},
     components::Inventory,
 };
 
@@ -22,20 +22,22 @@ fn draw_card() -> Card {
     let cards = vec![
         Card {
             card_type: CardType::Projectile(ProjectileType::Fireball),
-            name: "Fireball".to_string(),
-            description: "Launches a fireball in a random direction in the game!".to_string(),
-            cost: 1,
+            cost: 5,
             sprite_path: "sprites/cards/projectiles/fireball.png".to_string(),
             id: 0i8,
         },
         Card {
             card_type: CardType::Melee(MeleeType::Stomp),
-            name: "Stomp".to_string(),
-            description: "Stomp nearby enemies and regain some MP.".to_string(),
-            cost: 5,
+            cost: 10,
             sprite_path: "sprites/cards/melee/stomp.png".to_string(),
             id: 0i8,
         },
+        Card {
+            card_type: CardType::Buff(BuffType::Heal),
+            cost: 5,
+            sprite_path: "sprites/cards/buffs/heal.png".to_string(),
+            id: 0i8,
+        }
     ];
 
     let mut rng: ThreadRng = thread_rng();
