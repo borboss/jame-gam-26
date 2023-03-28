@@ -21,7 +21,7 @@ impl Plugin for PlayerPlugin {
             .init_resource::<MP>()
             .init_resource::<PlayerPosition>()
             .add_system(spawn_player.in_schedule(OnEnter(AppState::Game))) // player is stationary
-            .add_system(despawn_player.in_schedule(OnEnter(SimulationState::Paused)));
+            .add_system(despawn_player.in_schedule(OnEnter(SimulationState::GameOver)));
                                                                                //.add_system(move_player.before(confine_player_movement))
                                                                                //.add_system(confine_player_movement);
     }

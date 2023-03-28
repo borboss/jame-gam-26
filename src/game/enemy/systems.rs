@@ -123,7 +123,6 @@ pub fn animate_enemy_sprite(
 pub fn tick_enemy_spawn_timer(
     mut enemy_spawn_timer: ResMut<EnemySpawnTimer>,
     time: Res<Time>,
-    total_enemies: Res<TotalEnemySpawns>,
 ) {
     enemy_spawn_timer.timer.tick(time.delta());
 }
@@ -138,7 +137,10 @@ pub fn spawn_enemies_time(
     mut total_enemies: ResMut<TotalEnemySpawns>,
 ) {
     if spawn_timer.timer.finished() {
-        for _ in 0..=(E.powf(total_enemies.total_spawns as f32 / 20.0) as i32) {
+        for _ in 0..=(E
+            .powf(total_enemies.total_spawns as f32 / 20.0)
+            .clamp(1.0, 20.0) as i32)
+        {
             let random_side: Vec2;
             let weight = random::<f32>();
             random_side = POSITIONS[weight.round() as usize];
@@ -213,7 +215,7 @@ pub fn swordsman_handler(
                         hp.hp -= enemy.damage;
                         commands
                             .entity(entity)
-                            .insert(CooldownTimer(Timer::from_seconds(5.0, TimerMode::Once)));
+                            .insert(CooldownTimer(Timer::from_seconds(7.5, TimerMode::Once)));
 
                         let midpoint = (player_position.position + transform.translation) / 2.0;
                         let direction = (player_position.position - midpoint).normalize();
@@ -323,7 +325,7 @@ pub fn archer_handler(
                         hp.hp -= enemy.damage;
                         commands
                             .entity(entity)
-                            .insert(CooldownTimer(Timer::from_seconds(5.0, TimerMode::Once)));
+                            .insert(CooldownTimer(Timer::from_seconds(10.0, TimerMode::Once)));
 
                         let midpoint = (player_position.position + transform.translation) / 2.0;
                         let midmidpoint: Vec3 = (midpoint + transform.translation) / 2.0;

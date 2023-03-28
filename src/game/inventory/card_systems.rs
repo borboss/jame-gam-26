@@ -270,11 +270,53 @@ pub fn play_card(
                             AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
                         ));
                     }
+                    ProjectileType::NrgBall => {let tile_size = Vec2::new(64.0, 32.0);
+                        let texture_handle = asset_server.load("sprites/projectiles/nrg_ball.png");
+                        let texture_atlas = TextureAtlas::from_grid(
+                            texture_handle,
+                            tile_size,
+                            3,
+                            1,
+                            None,
+                            None,
+                        ); 
+                        let texture_atlas_handle = texture_atlases.add(texture_atlas);
+                        let mut rng = thread_rng();
+                        commands.spawn((
+                            SpriteSheetBundle {
+                                texture_atlas: texture_atlas_handle,
+                                sprite: TextureAtlasSprite::new(0),
+                                transform: Transform::from_translation(Vec3::new(
+                                    player_position.position.x,
+                                    player_position.position.y,
+                                    9.0,
+                                ))
+                                .with_scale(Vec3::new(5.0f32, 5.0f32, 1.0f32)),
+                                ..default()
+                            },
+                            SpawnedProjectile {
+                                direction: Vec2::new(rng.gen_range(-1.0..=1.0), rng.gen_range(-1.0..=1.0)).normalize(),
+                                total_bounces: 0,
+                                max_bounces: 5,
+                                x_radius: 50.0,
+                                y_radius: 10.0,
+                                damage: 3,
+                            },
+                            DamageEnemy {},
+                            AnimationIndices {
+                                first: 0,
+                                last: 2,
+                                delete_on_end: false,
+                            },
+                            AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
+                        ));
+                    }
                     ProjectileType::Other => panic!("No card should have projectiletype other."),
                 }
             }
             CardType::Buff(buff_type) => {
-                // Animation here does not seem to work.
+                mp.mp -= card.cost as i32;
+                mp.mp = mp.mp.clamp(0, mp.max_mp);
                 match buff_type {
                     BuffType::Heal => {
                      hp.hp += (random::<f32>() * 10.0) as i32;

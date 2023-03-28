@@ -12,6 +12,7 @@ use super::SimulationState;
 pub struct EnemyPlugin;
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
+        // Add Despawn
         app
             .init_resource::<EnemySpawnTimer>()
             .init_resource::<TotalEnemySpawns>()

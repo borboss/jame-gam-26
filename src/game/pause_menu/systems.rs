@@ -60,12 +60,12 @@ pub fn pause_handler(
     keyboard_input: Res<Input<KeyCode>>,
     sim_state: Res<State<SimulationState>>,
 ) {
-    if keyboard_input.just_released(KeyCode::Escape) && sim_state.0 != SimulationState::Running {
+    if keyboard_input.just_released(KeyCode::Escape) && sim_state.0 == SimulationState::Paused {
         for pause_component_entity in pause_components.iter() {
             commands.entity(pause_component_entity).despawn();
         }
         commands.insert_resource(NextState(Some(SimulationState::Running)));
-    } else if keyboard_input.just_released(KeyCode::Escape) && sim_state.0 != SimulationState::Paused {
+    } else if keyboard_input.just_released(KeyCode::Escape) && sim_state.0 == SimulationState::Running {
         commands.insert_resource(NextState(Some(SimulationState::Paused)));
     }
 }

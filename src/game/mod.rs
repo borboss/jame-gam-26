@@ -34,6 +34,6 @@ impl Plugin for GamePlugin {
 pub enum SimulationState {
     #[default]
     Running,
-    Paused,
     GameOver,
+    Paused,
 }

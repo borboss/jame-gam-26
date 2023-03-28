@@ -53,10 +53,10 @@ pub fn spawn_player(
     ));
 
     // init resources
-    hp.max_hp = 25;
-    hp.hp = 25;
-    mp.max_mp = 25;
-    mp.mp = 25;
+    hp.max_hp = 35;
+    hp.hp = 35;
+    mp.max_mp = 50;
+    mp.mp = 50;
 
     player_position.position = Vec3::new(480.0, 265.0, 1.0f32);
 }

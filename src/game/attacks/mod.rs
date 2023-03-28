@@ -13,6 +13,7 @@ pub struct AttackPlugin;
 
 impl Plugin for AttackPlugin {
     fn build(&self, app: &mut App) {
+        // Add Despawn
         app.add_system(
             move_projectile
             .in_set(OnUpdate(AppState::Game))

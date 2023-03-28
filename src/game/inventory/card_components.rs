@@ -37,6 +37,7 @@ pub enum MeleeType {
 #[derive(Default, Clone, Copy, Debug)]
 pub enum ProjectileType {
     Fireball,
+    NrgBall,
     #[default] Other,
 }
 #[derive(Default, Clone, Copy, Debug)]
