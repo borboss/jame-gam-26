@@ -1,6 +1,6 @@
 use bevy::prelude::{Component};
 
-#[derive(Component, Debug, Clone)]
+#[derive(Component, Debug, Clone, PartialEq)]
 pub struct Card {
     pub card_type: CardType,
     pub cost: u8,
@@ -21,7 +21,7 @@ impl Default for Card {
 #[derive(Component)]
 pub struct InInventory;
 
-#[derive(Default, Clone, Copy, Debug)]
+#[derive(Default, Clone, Copy, Debug, PartialEq)]
 pub enum CardType {
     Projectile(ProjectileType),
     Melee(MeleeType),
@@ -29,18 +29,18 @@ pub enum CardType {
     #[default] Other,
 }
 
-#[derive(Default, Clone, Copy, Debug)]
+#[derive(Default, Clone, Copy, Debug, PartialEq)]
 pub enum MeleeType {
     Stomp,
     #[default] Other,
 }
-#[derive(Default, Clone, Copy, Debug)]
+#[derive(Default, Clone, Copy, Debug, PartialEq)]
 pub enum ProjectileType {
     Fireball,
     NrgBall,
     #[default] Other,
 }
-#[derive(Default, Clone, Copy, Debug)]
+#[derive(Default, Clone, Copy, Debug, PartialEq)]
 pub enum BuffType {
     Heal,
     #[default] Other,

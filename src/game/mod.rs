@@ -2,19 +2,19 @@ use bevy::prelude::*;
 
 pub mod attacks;
 mod enemy;
+pub mod game_over;
 mod inventory;
 mod pause_menu;
 pub mod player;
 mod stat_bar;
-mod game_over;
 
 use attacks::AttackPlugin;
 use enemy::EnemyPlugin;
+use game_over::GameOverPlugin;
 use inventory::InventoryPlugin;
 use pause_menu::PauseMenuPlugin;
 use player::PlayerPlugin;
 use stat_bar::StatBarPlugin;
-use game_over::GameOverPlugin;
 
 pub struct GamePlugin;
 impl Plugin for GamePlugin {

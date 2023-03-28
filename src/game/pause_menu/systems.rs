@@ -1,7 +1,7 @@
 use bevy::{
     prelude::{
-        default, AssetServer, Assets, Commands, Input, KeyCode, NextState, Res, ResMut, State,
-        Transform, Vec2, Vec3, Entity, Query, With,
+        default, AssetServer, Assets, Commands, Entity, Input, KeyCode, NextState, Query, Res,
+        ResMut, State, Transform, Vec2, Vec3, With,
     },
     sprite::{SpriteBundle, SpriteSheetBundle, TextureAtlas, TextureAtlasSprite},
     time::{Timer, TimerMode},
@@ -14,15 +14,30 @@ use crate::{
 
 use super::components::PauseMenuComponentMarker;
 
-pub fn spawn_pause_screen(mut commands: Commands, asset_server: Res<AssetServer>) {
+pub fn spawn_pause_screen(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+) {
+    let texture_handle = asset_server.load("sprites/pausescreen.png");
+    let texture_atlas =
+        TextureAtlas::from_grid(texture_handle, Vec2::new(320.0, 180.0), 5, 1, None, None);
+    let texture_atlas_handle = texture_atlases.add(texture_atlas);
     commands.spawn((
-        SpriteBundle {
+        SpriteSheetBundle {
+            texture_atlas: texture_atlas_handle,
+            sprite: TextureAtlasSprite::new(0),
             transform: Transform::from_xyz(960.0 / 2.0, 540.0 / 2.0, 10.0f32)
                 .with_scale(Vec3::new(3.0f32, 3.0f32, 1.0f32)),
-            texture: asset_server.load("sprites/pausescreen.png"),
-
             ..default()
         },
+        MenuAnimationIndices {
+            first: 0,
+            last: 4,
+            delete_on_end: false,
+            stop_on_end: true,
+        },
+        MenuAnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
         PauseMenuComponentMarker,
     ));
 }
@@ -48,6 +63,7 @@ pub fn spawn_text(
             first: 0,
             last: 1,
             delete_on_end: false,
+            stop_on_end: true,
         },
         MenuAnimationTimer(Timer::from_seconds(1.0, TimerMode::Repeating)),
         PauseMenuComponentMarker,
@@ -65,7 +81,9 @@ pub fn pause_handler(
             commands.entity(pause_component_entity).despawn();
         }
         commands.insert_resource(NextState(Some(SimulationState::Running)));
-    } else if keyboard_input.just_released(KeyCode::Escape) && sim_state.0 == SimulationState::Running {
+    } else if keyboard_input.just_released(KeyCode::Escape)
+        && sim_state.0 == SimulationState::Running
+    {
         commands.insert_resource(NextState(Some(SimulationState::Paused)));
     }
 }

@@ -29,7 +29,7 @@ fn draw_card() -> Card {
         Card {
             card_type: CardType::Projectile(ProjectileType::NrgBall),
             cost: 5,
-            sprite_path: "sprites/cards/buffs/heal.png".to_string(),
+            sprite_path: "sprites/cards/projectiles/nrg_ball.png".to_string(),
             id: 0i8,
         },
         Card {

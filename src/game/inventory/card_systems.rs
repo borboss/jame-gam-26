@@ -1,15 +1,15 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy_tweening::Lerp;
-use rand::{thread_rng, Rng, random};
+use rand::{random, thread_rng, Rng};
 
 use crate::game::attacks::components::{DamageEnemy, DontManageZ};
-use crate::game::enemy::components::{AnimationTimer, AnimationIndices};
+use crate::game::enemy::components::{AnimationIndices, AnimationTimer};
 use crate::game::inventory::components::Inventory;
-use crate::game::player::components::{PlayerPosition, MP, HP};
+use crate::game::player::components::{PlayerPosition, HP, MP};
 use crate::game::{attacks::components::SpawnedProjectile, inventory::card_components::Card};
 
-use super::card_components::{CardType, MeleeType, ProjectileType, MarkedForPlaying, BuffType};
+use super::card_components::{BuffType, CardType, MarkedForPlaying, MeleeType, ProjectileType};
 
 pub const IDLE_POSITIONS: [Vec3; 3] = [
     Vec3::new(75.0, 90.0, 9.01),
@@ -80,6 +80,7 @@ pub fn card_handler(
     keys: Res<Input<KeyCode>>,
     mut inventory_resource: ResMut<Inventory>,
     mut commands: Commands,
+    mp: Res<MP>,
 ) {
     let window: &Window = window_query.get_single().unwrap();
     let (camera_transform, camera) = camera_query.single_mut();
@@ -119,7 +120,11 @@ pub fn card_handler(
             );
             if btn.just_pressed(MouseButton::Left) {
                 for (entity, _, _, card) in card_query.iter() {
-                    if card.id == closest_card {
+                    let excuse_cost: bool = match card.card_type {
+                        CardType::Melee(_) => true,
+                        _ => false,
+                    };
+                    if card.id == closest_card && (excuse_cost || mp.mp - (card.cost as i32) >= 0) {
                         commands.entity(entity).insert(MarkedForPlaying);
                         inventory_resource.cards.remove(card.id as usize);
                     }
@@ -169,7 +174,7 @@ pub fn play_card(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     player_position: Res<PlayerPosition>,
-    mut texture_atlases: ResMut<Assets<TextureAtlas>>
+    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) {
     // CARDS TODO:
     // TODO: More attacks.
@@ -182,14 +187,8 @@ pub fn play_card(
                     MeleeType::Stomp => {
                         let tile_size = Vec2::new(64.0, 64.0);
                         let texture_handle = asset_server.load("sprites/effects/stomp.png");
-                        let texture_atlas = TextureAtlas::from_grid(
-                            texture_handle,
-                            tile_size,
-                            4,
-                            1,
-                            None,
-                            None,
-                        ); 
+                        let texture_atlas =
+                            TextureAtlas::from_grid(texture_handle, tile_size, 4, 1, None, None);
                         let texture_atlas_handle = texture_atlases.add(texture_atlas);
                         commands.spawn((
                             SpriteSheetBundle {
@@ -231,14 +230,8 @@ pub fn play_card(
                     ProjectileType::Fireball => {
                         let tile_size = Vec2::new(64.0, 32.0);
                         let texture_handle = asset_server.load("sprites/projectiles/fireball.png");
-                        let texture_atlas = TextureAtlas::from_grid(
-                            texture_handle,
-                            tile_size,
-                            3,
-                            1,
-                            None,
-                            None,
-                        ); 
+                        let texture_atlas =
+                            TextureAtlas::from_grid(texture_handle, tile_size, 3, 1, None, None);
                         let texture_atlas_handle = texture_atlases.add(texture_atlas);
                         let mut rng = thread_rng();
                         commands.spawn((
@@ -254,9 +247,13 @@ pub fn play_card(
                                 ..default()
                             },
                             SpawnedProjectile {
-                                direction: Vec2::new(rng.gen_range(-1.0..=1.0), rng.gen_range(-1.0..=1.0)).normalize(),
+                                direction: Vec2::new(
+                                    rng.gen_range(-1.0..=1.0),
+                                    rng.gen_range(-1.0..=1.0),
+                                )
+                                .normalize(),
                                 total_bounces: 0,
-                                max_bounces: 5,
+                                max_bounces: 2,
                                 x_radius: 50.0,
                                 y_radius: 10.0,
                                 damage: 3,
@@ -270,16 +267,11 @@ pub fn play_card(
                             AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
                         ));
                     }
-                    ProjectileType::NrgBall => {let tile_size = Vec2::new(64.0, 32.0);
+                    ProjectileType::NrgBall => {
+                        let tile_size = Vec2::new(32.0, 32.0);
                         let texture_handle = asset_server.load("sprites/projectiles/nrg_ball.png");
-                        let texture_atlas = TextureAtlas::from_grid(
-                            texture_handle,
-                            tile_size,
-                            3,
-                            1,
-                            None,
-                            None,
-                        ); 
+                        let texture_atlas =
+                            TextureAtlas::from_grid(texture_handle, tile_size, 3, 1, None, None);
                         let texture_atlas_handle = texture_atlases.add(texture_atlas);
                         let mut rng = thread_rng();
                         commands.spawn((
@@ -291,15 +283,19 @@ pub fn play_card(
                                     player_position.position.y,
                                     9.0,
                                 ))
-                                .with_scale(Vec3::new(5.0f32, 5.0f32, 1.0f32)),
+                                .with_scale(Vec3::new(1.0f32, 1.0f32, 1.0f32)),
                                 ..default()
                             },
                             SpawnedProjectile {
-                                direction: Vec2::new(rng.gen_range(-1.0..=1.0), rng.gen_range(-1.0..=1.0)).normalize(),
+                                direction: Vec2::new(
+                                    rng.gen_range(-1.0..=1.0),
+                                    rng.gen_range(-1.0..=1.0),
+                                )
+                                .normalize(),
                                 total_bounces: 0,
                                 max_bounces: 5,
-                                x_radius: 50.0,
-                                y_radius: 10.0,
+                                x_radius: 32.0,
+                                y_radius: 32.0,
                                 damage: 3,
                             },
                             DamageEnemy {},
@@ -319,41 +315,33 @@ pub fn play_card(
                 mp.mp = mp.mp.clamp(0, mp.max_mp);
                 match buff_type {
                     BuffType::Heal => {
-                     hp.hp += (random::<f32>() * 10.0) as i32;
-                     hp.hp = hp.hp.clamp(0, hp.max_hp);
+                        hp.hp += (random::<f32>() * 10.0) as i32;
+                        hp.hp = hp.hp.clamp(0, hp.max_hp);
 
-                     let tile_size = Vec2::new(24.0, 24.0);
-                     let texture_handle = asset_server.load("sprites/effects/player-heal.png");
-                     let texture_atlas = TextureAtlas::from_grid(
-                         texture_handle,
-                         tile_size,
-                         9,
-                         1,
-                         None,
-                         None,
-                     ); 
-                     let texture_atlas_handle = texture_atlases.add(texture_atlas);
-                     commands.spawn((
-                         SpriteSheetBundle {
-                             texture_atlas: texture_atlas_handle,
-                             sprite: TextureAtlasSprite::new(0),
-                             transform: Transform::from_translation(Vec3::new(
-                                 player_position.position.x,
-                                 player_position.position.y,
-                                 0.95,
-                             ))
-                             .with_scale(Vec3::new(2.5f32, 2.5f32, 1.0f32)),
-                             ..default()
-                         },
-                         AnimationIndices {
-                             first: 0,
-                             last: 8,
-                             delete_on_end: true,
-                         },
-                         AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
-                     ));
-
-
+                        let tile_size = Vec2::new(24.0, 24.0);
+                        let texture_handle = asset_server.load("sprites/effects/player-heal.png");
+                        let texture_atlas =
+                            TextureAtlas::from_grid(texture_handle, tile_size, 9, 1, None, None);
+                        let texture_atlas_handle = texture_atlases.add(texture_atlas);
+                        commands.spawn((
+                            SpriteSheetBundle {
+                                texture_atlas: texture_atlas_handle,
+                                sprite: TextureAtlasSprite::new(0),
+                                transform: Transform::from_translation(Vec3::new(
+                                    player_position.position.x,
+                                    player_position.position.y,
+                                    0.95,
+                                ))
+                                .with_scale(Vec3::new(2.5f32, 2.5f32, 1.0f32)),
+                                ..default()
+                            },
+                            AnimationIndices {
+                                first: 0,
+                                last: 8,
+                                delete_on_end: true,
+                            },
+                            AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
+                        ));
                     }
                     BuffType::Other => panic!("No card should have any type other."),
                 }

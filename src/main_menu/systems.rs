@@ -1,13 +1,16 @@
 use bevy::{
+    ecs::query::Or,
     prelude::{
-        default, AssetServer, Assets, Commands, Entity, Query, Res, ResMut, Transform, Vec2, Vec3,
-        With, KeyCode, Input, State, NextState,
+        default, AssetServer, Assets, Commands, Entity, Input, KeyCode, NextState, Query, Res,
+        ResMut, State, Transform, Vec2, Vec3, With,
     },
     sprite::{SpriteBundle, SpriteSheetBundle, TextureAtlas, TextureAtlasSprite},
     time::{Time, Timer, TimerMode},
 };
 
-use crate::{AppState, game::SimulationState};
+use crate::{
+    game::game_over::components::GameOverMenuComponentMarker, game::SimulationState, AppState,
+};
 
 use super::components::{MainMenuComponentMarker, MenuAnimationIndices, MenuAnimationTimer};
 
@@ -45,6 +48,7 @@ pub fn spawn_text(
             first: 0,
             last: 1,
             delete_on_end: false,
+            stop_on_end: false,
         },
         MenuAnimationTimer(Timer::from_seconds(1.0, TimerMode::Repeating)),
         MainMenuComponentMarker,
@@ -70,11 +74,15 @@ pub fn animate_menu_text(
             &mut MenuAnimationTimer,
             &mut TextureAtlasSprite,
         ),
-        With<MainMenuComponentMarker>,
+        Or<(
+            With<MainMenuComponentMarker>,
+            With<GameOverMenuComponentMarker>,
+        )>,
     >,
 ) {
     for (entity, indices, mut timer, mut sprite) in query.iter_mut() {
         timer.tick(time.delta());
+        println!("Anim");
         if timer.just_finished() {
             if sprite.index == indices.last {
                 if indices.delete_on_end {

@@ -193,11 +193,6 @@ pub fn swordsman_handler(
             0.95 is Attacks (Lower Half of Screen)
             0.9 is Enemies (Lower Half of Screen)
             */
-            if transform.translation.y < 540.0 / 2.0 {
-                transform.translation.z = 1.4;
-            } else {
-                transform.translation.z = 0.9;
-            }
 
             let speed = enemy.speed; // adjust this to change the enemy speed
             let target_position = player_position.position
@@ -207,7 +202,7 @@ pub fn swordsman_handler(
             let distance_to_target = (target_position - transform.translation).length();
 
             if distance_to_target < 10.0 {
-                transform.translation = target_position;
+                transform.translation = Vec3::new(target_position.x, target_position.y, transform.translation.z);
                 // if attack possible -> attack, spawn attack, attack active, damage player. Once attack not active, then attack not active
                 // if attacking -> check if active
                 match enemy.state {
@@ -267,6 +262,11 @@ pub fn swordsman_handler(
             }
 
             angle += angle_step;
+            if transform.translation.y < 540.0 / 2.0 {
+                transform.translation.z = 1.4;
+            } else {
+                transform.translation.z = 0.9;
+            }
         }
     }
 }
