@@ -343,6 +343,9 @@ pub fn play_card(
                             AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
                         ));
                     }
+                    BuffType::SlowDown => {
+                        
+                    },
                     BuffType::Other => panic!("No card should have any type other."),
                 }
             }
@@ -362,5 +365,11 @@ pub fn inventory_changed(
             commands.entity(entity).despawn();
         }
         init_render_cards(commands, inventory_resource, asset_server);
+    }
+}
+
+pub fn despawn_cards(mut commands: Commands, cards: Query<Entity, With<Card>>) {
+    for entity in cards.iter() {
+        commands.entity(entity).despawn();
     }
 }
