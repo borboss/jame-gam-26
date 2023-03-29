@@ -83,3 +83,9 @@ pub fn projectile_z_manager(mut projectile_query: Query<&mut Transform, Without<
         }
     }
 }
+
+pub fn despawn_projectiles(mut commands: Commands, projectiles: Query<Entity, With<SpawnedProjectile>>) {
+    for entity in projectiles.iter() {
+        commands.entity(entity).despawn();
+    }
+}

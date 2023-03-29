@@ -1,7 +1,6 @@
 pub mod components;
 mod systems;
 
-
 use bevy::prelude::*;
 use systems::*;
 
@@ -16,8 +15,9 @@ impl Plugin for AttackPlugin {
         // Add Despawn
         app.add_system(
             move_projectile
-            .in_set(OnUpdate(AppState::Game))
-            .in_set(OnUpdate(SimulationState::Running))
-        );
+                .in_set(OnUpdate(AppState::Game))
+                .in_set(OnUpdate(SimulationState::Running)),
+        )
+        .add_system(despawn_projectiles.in_schedule(OnEnter(SimulationState::GameOver)));
     }
 }

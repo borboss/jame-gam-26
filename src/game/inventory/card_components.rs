@@ -1,4 +1,4 @@
-use bevy::prelude::{Component};
+use bevy::prelude::Component;
 
 #[derive(Component, Debug, Clone, PartialEq)]
 pub struct Card {
@@ -11,8 +11,8 @@ impl Default for Card {
     fn default() -> Card {
         Card {
             card_type: CardType::Projectile(ProjectileType::Fireball),
-            cost: 10u8,            
-            sprite_path: "sprites/cards/attacks/blank_attack.png".to_string(),   
+            cost: 10u8,
+            sprite_path: "sprites/cards/attacks/blank_attack.png".to_string(),
             id: 0i8,
         }
     }
@@ -26,27 +26,30 @@ pub enum CardType {
     Projectile(ProjectileType),
     Melee(MeleeType),
     Buff(BuffType),
-    #[default] Other,
+    #[default]
+    Other,
 }
 
 #[derive(Default, Clone, Copy, Debug, PartialEq)]
 pub enum MeleeType {
     Stomp,
-    #[default] Other,
+    #[default]
+    Other,
 }
 #[derive(Default, Clone, Copy, Debug, PartialEq)]
 pub enum ProjectileType {
     Fireball,
     NrgBall,
-    #[default] Other,
+    #[default]
+    Other,
 }
 #[derive(Default, Clone, Copy, Debug, PartialEq)]
 pub enum BuffType {
     Heal,
-    #[default] Other,
+    SlowDown,
+    #[default]
+    Other,
 }
-
-
 
 #[derive(Component)]
 pub struct MarkedForPlaying;

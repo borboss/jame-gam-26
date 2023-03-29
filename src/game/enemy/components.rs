@@ -48,18 +48,17 @@ pub struct AnimationTimer(pub Timer);
 
 #[derive(Default)]
 pub enum EnemyState {
-    #[default] Moving,
+    #[default]
+    Moving,
     Attacking,
-    AttackPossible
+    AttackPossible,
 }
 
 #[derive(Component)]
 pub struct DeleteAfterAnimation {}
 
-
 #[derive(Component, Deref, DerefMut)]
 pub struct CooldownTimer(pub Timer);
-
 
 #[derive(Component)]
 pub struct SwordsmanMarker;
@@ -67,8 +66,10 @@ pub struct SwordsmanMarker;
 #[derive(Component)]
 pub struct ArcherMarker;
 
-
 #[derive(Resource, Default)]
 pub struct TotalEnemySpawns {
     pub total_spawns: u64,
 }
+
+#[derive(Component)]
+pub struct EnemyAnimationMarker;

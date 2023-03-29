@@ -15,8 +15,8 @@ impl Plugin for StatBarPlugin {
         app.add_system(init_render_bar.in_schedule(OnEnter(AppState::Game)))
             .add_system(
                 update_bars
-                    .in_set(OnUpdate(AppState::Game))
-                    .in_set(OnUpdate(SimulationState::Running)),
-            );
+                    .in_set(OnUpdate(AppState::Game)),
+            )
+            .add_system(despawn_bars.in_schedule(OnEnter(SimulationState::GameOver)));
     }
 }

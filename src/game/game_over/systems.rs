@@ -19,7 +19,13 @@ pub fn game_over_initiator(
     }
 }
 
-pub fn restart_game_init() {}
+pub fn restart_game_init(mut commands: Commands, input: Res<Input<KeyCode>>) {
+    if input.just_pressed(KeyCode::Return) || input.just_pressed(KeyCode::NumpadEnter) {
+        println!("RESTART");
+        commands.insert_resource(NextState(Some(SimulationState::Running)));
+        commands.insert_resource(NextState(Some(AppState::MainMenu)));
+    }
+}
 
 pub fn spawn_game_over(
     mut commands: Commands,
@@ -45,7 +51,7 @@ pub fn spawn_game_over(
         SpriteSheetBundle {
             texture_atlas: texture_atlas_handle,
             sprite: TextureAtlasSprite::new(0),
-            transform: Transform::from_xyz(960.0 / 2.0, 540.0 / 2.0, 11.0f32)
+            transform: Transform::from_xyz(960.0 / 2.0, 540.0 / 2.0, 10.0f32)
                 .with_scale(Vec3::new(3.0f32, 3.0f32, 1.0f32)),
             ..default()
         },
@@ -53,9 +59,9 @@ pub fn spawn_game_over(
             first: 0,
             last: 4,
             delete_on_end: false,
-            stop_on_end: false,
+            stop_on_end: true,
         },
-        MenuAnimationTimer(Timer::from_seconds(0.1, TimerMode::Once)),
+        MenuAnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
         GameOverMenuComponentMarker,
     ));
 }
@@ -65,7 +71,6 @@ pub fn spawn_text(
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) {
-    // CHANGE TO GAME OVER TEXT
     let texture_handle = asset_server.load("sprites/gameoverscreen-text.png");
     let texture_atlas =
         TextureAtlas::from_grid(texture_handle, Vec2::new(320.0, 180.0), 2, 1, None, None);
@@ -87,4 +92,10 @@ pub fn spawn_text(
         MenuAnimationTimer(Timer::from_seconds(1.0, TimerMode::Repeating)),
         GameOverMenuComponentMarker,
     ));
+}
+
+pub fn despawn_pause_menu(mut commands: Commands, gameover_menu_components: Query<Entity, With<GameOverMenuComponentMarker>>) {
+    for entity in gameover_menu_components.iter() {
+        commands.entity(entity).despawn();
+    }
 }

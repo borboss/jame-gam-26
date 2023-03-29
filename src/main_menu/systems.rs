@@ -82,11 +82,11 @@ pub fn animate_menu_text(
 ) {
     for (entity, indices, mut timer, mut sprite) in query.iter_mut() {
         timer.tick(time.delta());
-        println!("Anim");
         if timer.just_finished() {
             if sprite.index == indices.last {
                 if indices.delete_on_end {
                     commands.entity(entity).despawn();
+                } else if indices.stop_on_end {
                 } else {
                     sprite.index = indices.first;
                 }

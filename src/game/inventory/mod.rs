@@ -21,7 +21,7 @@ impl Plugin for InventoryPlugin {
             .add_plugin(TweeningPlugin)
             .add_systems(
                 (init_inventory.before(init_render_cards), init_render_cards)
-                    .in_schedule(OnEnter(AppState::Game))
+                    .in_schedule(OnEnter(AppState::Game)),
             )
             .add_systems(
                 (
@@ -32,6 +32,7 @@ impl Plugin for InventoryPlugin {
                 )
                     .in_set(OnUpdate(AppState::Game))
                     .in_set(OnUpdate(SimulationState::Running)),
-            );
+            )
+            .add_system(despawn_cards.in_schedule(OnEnter(SimulationState::GameOver)));
     }
 }

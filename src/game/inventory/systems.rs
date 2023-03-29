@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use rand::{rngs::ThreadRng, thread_rng, Rng};
 
 use super::{
-    card_components::{Card, CardType, ProjectileType, MeleeType, BuffType},
+    card_components::{BuffType, Card, CardType, MeleeType, ProjectileType},
     components::Inventory,
 };
 
@@ -22,28 +22,34 @@ fn draw_card() -> Card {
     let cards = vec![
         Card {
             card_type: CardType::Projectile(ProjectileType::Fireball),
-            cost: 5,
+            cost: 10,
             sprite_path: "sprites/cards/projectiles/fireball.png".to_string(),
             id: 0i8,
         },
         Card {
             card_type: CardType::Projectile(ProjectileType::NrgBall),
-            cost: 5,
+            cost: 15,
             sprite_path: "sprites/cards/projectiles/nrg_ball.png".to_string(),
             id: 0i8,
         },
         Card {
             card_type: CardType::Melee(MeleeType::Stomp),
-            cost: 10,
+            cost: 5,
             sprite_path: "sprites/cards/melee/stomp.png".to_string(),
             id: 0i8,
         },
         Card {
             card_type: CardType::Buff(BuffType::Heal),
-            cost: 5,
+            cost: 15,
             sprite_path: "sprites/cards/buffs/heal.png".to_string(),
             id: 0i8,
-        }
+        },
+        /*Card {
+            card_type: CardType::Buff(BuffType::SlowDown),
+            cost: 5,
+            sprite_path: "sprites/cards/buffs/slowdown.png".to_string(),
+            id: 0i8,
+        },*/
     ];
 
     let mut rng: ThreadRng = thread_rng();
@@ -51,3 +57,5 @@ fn draw_card() -> Card {
     let card = cards[index].clone();
     return card;
 }
+
+

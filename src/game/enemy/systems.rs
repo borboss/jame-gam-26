@@ -120,10 +120,7 @@ pub fn animate_enemy_sprite(
     }
 }
 
-pub fn tick_enemy_spawn_timer(
-    mut enemy_spawn_timer: ResMut<EnemySpawnTimer>,
-    time: Res<Time>,
-) {
+pub fn tick_enemy_spawn_timer(mut enemy_spawn_timer: ResMut<EnemySpawnTimer>, time: Res<Time>) {
     enemy_spawn_timer.timer.tick(time.delta());
 }
 
@@ -202,7 +199,11 @@ pub fn swordsman_handler(
             let distance_to_target = (target_position - transform.translation).length();
 
             if distance_to_target < 10.0 {
-                transform.translation = Vec3::new(target_position.x, target_position.y, transform.translation.z);
+                transform.translation = Vec3::new(
+                    target_position.x,
+                    target_position.y,
+                    transform.translation.z,
+                );
                 // if attack possible -> attack, spawn attack, attack active, damage player. Once attack not active, then attack not active
                 // if attacking -> check if active
                 match enemy.state {
@@ -243,6 +244,7 @@ pub fn swordsman_handler(
                                 delete_on_end: true,
                             },
                             AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
+                            EnemyAnimationMarker,
                         ));
                         enemy.state = EnemyState::Attacking;
                     }
@@ -362,6 +364,7 @@ pub fn archer_handler(
                                 delete_on_end: true,
                             },
                             AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
+                            EnemyAnimationMarker,
                         ));
                         enemy.state = EnemyState::Attacking;
                     }
@@ -444,5 +447,12 @@ pub fn enemy_death_handler(
                 commands.entity(entity).despawn();
             }
         }
+    }
+}
+
+
+pub fn despawn_enemies(mut commands: Commands, enemies: Query<Entity, Or<(With<Enemy>, With<EnemyAnimationMarker>)>>) {
+    for entity in enemies.iter() {
+        commands.entity(entity).despawn();
     }
 }

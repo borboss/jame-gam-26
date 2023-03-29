@@ -16,7 +16,6 @@ impl Plugin for MainMenuPlugin {
         app.add_systems((spawn_main_menu, spawn_text).in_schedule(OnEnter(AppState::MainMenu)))
             .add_system(clean_up_main_menu.in_schedule(OnEnter(AppState::Game)))
             .add_system(begin_game_handler.in_set(OnUpdate(AppState::MainMenu)))
-            .add_system(animate_menu_text)
-            ;
+            .add_system(animate_menu_text);
     }
 }
