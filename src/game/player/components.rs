@@ -1,6 +1,10 @@
 use bevy::prelude::Component;
 use bevy::prelude::Resource;
 use bevy::prelude::Vec3;
+use bevy::time::Timer;
+use bevy::time::TimerMode;
+
+pub const MANA_GEN_TIME:f32 = 2.0;
 
 #[derive(Component, Default)]
 pub struct Player {}
@@ -19,4 +23,16 @@ pub struct MP {
 #[derive(Resource, Default)]
 pub struct PlayerPosition {
     pub position: Vec3,
+}
+
+#[derive(Resource)]
+pub struct ManaGenTimer {
+    pub timer: Timer,
+}
+impl Default for ManaGenTimer {
+    fn default() -> ManaGenTimer {
+        ManaGenTimer {
+            timer: Timer::from_seconds(MANA_GEN_TIME, TimerMode::Repeating),
+        }
+    }
 }

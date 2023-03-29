@@ -1,4 +1,7 @@
 use bevy::prelude::*;
+use rand::random;
+
+use crate::game::enemy::components::EnemySpawnTimer;
 
 use super::components::{Player, HP, MP};
 use super::*;
@@ -95,4 +98,14 @@ pub fn despawn_player(mut commands: Commands, query: Query<Entity, With<Player>>
     for entity in query.iter() {
         commands.entity(entity).despawn();
     }
+}
+
+
+pub fn managen_managen(mut mp: ResMut<MP>, mana_timer: Res<ManaGenTimer>) {
+    if mana_timer.timer.finished() {
+        mp.mp += (15.0 * random::<f32>()) as i32;
+    }
+}
+pub fn tick_managen_timer(mut mana_gen_timer: ResMut<ManaGenTimer>, time: Res<Time>) {
+    mana_gen_timer.timer.tick(time.delta());
 }
