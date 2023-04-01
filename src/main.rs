@@ -22,7 +22,7 @@ fn main() {
                     .set(ImagePlugin::default_nearest())
                     .set(WindowPlugin {
                         primary_window: Some(Window {
-                            title: "game title".into(),
+                            title: "Skeletal Defender".into(),
                             resolution: (960.0f32, 540.0f32).into(),
                             // wasm \/
                             fit_canvas_to_parent: true,
